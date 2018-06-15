@@ -12,14 +12,14 @@ let showDocumentation : Lazy<unit> =
 [<EntryPoint>]
 let main argv =
 
-    let f = LocVolCalib.LocVolCalib.main
+    let f = LocVolCalib.main
     let stopWatch = System.Diagnostics.Stopwatch.StartNew()
     //let res = f 16 32 256 256 0.03f 5.0f 0.2f 0.6f 0.5f
     stopWatch.Stop()
     printfn "%f" stopWatch.Elapsed.TotalMilliseconds
 
-    let PreludeDLL = "/home/mikkel/Documents/FShark/FSharkPrelude/bin/Debug/FSharkPrelude.dll"
-    let TestDLL = "/home/mikkel/Documents/FShark/bin/Debug/FShark.dll"
+    let PreludeDLL = "/home/mikkel/Documents/fshark/FSharkPrelude/bin/Debug/FSharkPrelude.dll"
+    let TestDLL = "/home/mikkel/Documents/fshark/bin/Debug/FShark.dll"
     if Array.length argv <> 1
     then ignore <| showDocumentation; 1
     else
@@ -28,7 +28,7 @@ let main argv =
         "/home/mikkel/FShark",
         "/home/mikkel/Cloo.clSharp.dll",
         "/home/mikkel/Mono.Options.dll",
-        "/home/mikkel/Documents/FShark/FSharkPrelude/bin/Debug/FSharkPrelude.dll",
+        "/home/mikkel/Documents/fshark/FSharkPrelude/bin/Debug/FSharkPrelude.dll",
          true,
          true
         )

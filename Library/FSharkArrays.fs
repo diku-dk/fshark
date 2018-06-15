@@ -2,34 +2,7 @@ namespace FShark.Library
 
 module FSharkArrays =
   open System.Text.RegularExpressions
-
-  type FSharkArray<'a> = Header of System.Int32
-                       | Dimension of FSharkArray<'a> list
-                       | Bottom of 'a []
-              
-  let rec FSharkArrayToFlatArray (arr : FSharkArray<'a>) : ('a [] * int64 []) =
-     let checkRegularity arrs : unit =
-        if Array.length arrs = 0
-        then failwith "Empty array"
-        
-        let head = Array.head arrs
-        if not <| Array.forall (fun l -> l = head) arrs
-        then failwith "Irregular array"
-        
-     match arr with
-     | Bottom list -> (list, [|int64 <| Array.length list|])
-     | Dimension(subarrays) ->
-        let a =  List.toArray <| List.map FSharkArrayToFlatArray subarrays
-        let (subarrs, lens) = Array.unzip a
-        checkRegularity lens
-        let subarrs' = Array.concat subarrs
-        let lens' = Array.head lens
-        let len_subarrs = int64 <| List.length subarrays
-        let lens_out = Array.append [|len_subarrs|] lens'
-        (subarrs', lens_out)
-     | Header _ -> failwith "why this case?"
-     
-     
+  
   // husk at takke Christopher Pritchard og Abe Mieres fra F#-slacken
   let rec ArrayToFlatArray (array : System.Array) = 
       if array.Length = 0 then failwith "Empty array"
@@ -67,3 +40,8 @@ module FSharkArrays =
      | Dimension(subarrays) ->
      | Header _ -> failwith "why this case?"
      *)
+     
+
+  let RestoreFlatArray (variable : ('a [] * int64 [])) : obj =
+            let (data, dims) = variable
+            in FlatArrayToFSharkArray data dims

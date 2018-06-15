@@ -63,6 +63,7 @@ module TestBase =
                                  (Seq.toList <| v.Attributes)
                               then Some (v.DisplayName, elem)
                               else None
+                | _ -> None
                               
             let res = List.fold maybeElem Option.None elems
             in match res with
@@ -131,11 +132,15 @@ module TestBase =
                 with 
                     | ex -> printfn "%s" ex.Message; None
             stopWatch.Stop()
-            printfn "%f" stopWatch.Elapsed.TotalMilliseconds
+            printfn "FShark took %f milliseconds." stopWatch.Elapsed.TotalMilliseconds
             match fsharkTestResult with
             | None -> false
             | Some fsharkTestResult' ->
+            
+            let stopWatch2 = System.Diagnostics.Stopwatch.StartNew()
             let nativeTestResult = testFun.Invoke(0, testInput)
+            stopWatch2.Stop()
+            printfn "Native took %f milliseconds." stopWatch2.Elapsed.TotalMilliseconds
             let testOK = 
                 fsharkTestResult' = nativeTestResult &&
                 testOutput = nativeTestResult

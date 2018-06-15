@@ -113,6 +113,9 @@ module FSharkCompiler =
     
         | BasicPatterns.AddressOf(lvalueExpr) -> 
             GetFSharkCode lvalueExpr
+        | BasicPatterns.TypeLambda(_, bodyExpr) -> 
+            GetFSharkCode bodyExpr
+            
         | _ -> failwith (sprintf "unrecognized %+A" e)
         (*
         | BasicPatterns.AddressSet(lvalueExpr, rvalueExpr) -> 
@@ -147,8 +150,6 @@ module FSharkCompiler =
             visitExpr f bodyExpr; visitExpr f catchExpr
         | BasicPatterns.TupleGet(tupleType, tupleElemIndex, tupleExpr) -> 
             visitExpr f tupleExpr
-        | BasicPatterns.TypeLambda(genericParam, bodyExpr) -> 
-            visitExpr f bodyExpr
         | BasicPatterns.TypeTest(ty, inpExpr) -> 
             visitExpr f inpExpr
         | BasicPatterns.UnionCaseSet(unionExpr, unionType, unionCase, unionCaseField, valueExpr) ->        visitExpr f unionExpr; visitExpr f valueExpr

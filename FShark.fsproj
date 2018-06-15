@@ -79,21 +79,12 @@
     <Compile Include="IL\FSharkAST.fs" />
     <Compile Include="IL\FSharkIL.fs" />
     <Compile Include="Library\FSharkArrays.fs" />
+    <Compile Include="Library\ObjectWrappers.fs" />
     <Compile Include="Library\Utils.fs" />
     <Compile Include="Compiler\FSharkParser.fs" />
     <Compile Include="Compiler\FSharkCompiler.fs" />
     <Compile Include="Compiler\FSharkWriter.fs" />
     <Compile Include="FSharkMain.fs" />
-    <Compile Include="Tests\Benchmarks\nbodyTest.fs" />
-    <Compile Include="Tests\FSharkArraysTests.fs" />
-    <Compile Include="Tests\LocVolCalib.fs" />
-    <Compile Include="Tests\nbody.fs" />
-    <Content Include="Tests\MathFuns.fs" />
-    <Content Include="Tests\SOACSTest.fs" />
-    <Content Include="Tests\Vec3.fs" />
-    <Content Include="Tests\Basic.fs" />
-    <Content Include="Tests\Testlib.fs" />
-    <Content Include="Tests\UnitTests\Identity.fs" />
     <Compile Include="Program.fs" />
     <Content Include="packages.config" />
     <None Include="App.config" />
@@ -105,21 +96,6 @@
       <Name>FSharkPrelude</Name>
     </ProjectReference>
   </ItemGroup>
-  <Target Name="CopyTestLib" AfterTargets="AfterBuild">
-    <Copy SourceFiles="Tests\Testlib.fs" DestinationFolder="$(OutDir)" />
-  </Target>
-  <Target Name="CopyBasic" AfterTargets="AfterBuild">
-    <Copy SourceFiles="Tests\Basic.fs" DestinationFolder="$(OutDir)" />
-  </Target>
-  <Target Name="Copynbody" AfterTargets="AfterBuild">
-    <Copy SourceFiles="Tests\nbody.fs" DestinationFolder="$(OutDir)" />
-  </Target>
-  <Target Name="CopyVec3" AfterTargets="AfterBuild">
-    <Copy SourceFiles="Tests\Vec3.fs" DestinationFolder="$(OutDir)" />
-  </Target>
-  <Target Name="CopyMathFuns" AfterTargets="AfterBuild">
-    <Copy SourceFiles="Tests\MathFuns.fs" DestinationFolder="$(OutDir)" />
-  </Target>
   <PropertyGroup>
     <FSharpTargetsPath>.\packages\FSharp.Compiler.Tools.4.1.23\tools\Microsoft.FSharp.Targets</FSharpTargetsPath>
   </PropertyGroup>

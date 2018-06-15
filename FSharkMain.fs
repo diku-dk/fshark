@@ -11,6 +11,8 @@ open FShark.IL
 open FShark.Compiler
 open FShark.Library.Utils
 open FShark.Library.FSharkArrays
+open FShark.Library.ObjectWrappers
+
 
 module FSharkMain =
     type FSharkMain = class
@@ -37,18 +39,18 @@ module FSharkMain =
         abstract member GetCompiledFunction  : string -> MethodInfo
         abstract member InvokeFunction<'T> : string -> obj[] -> obj
         
-        new ((libName:string),(libRoot : string),(clooPath : string),
-            (monoPath : string),(preludePath : string),(openCL : bool), 
+        new ((libName:string),(tmpRoot : string),(clooPath : string),
+            (monoOptionsPath : string),(preludePath : string),(openCL : bool), 
             (unsafe : bool)) =
                 { InputFunctions = Map.empty
                 ; CompiledFunctions = Map.empty
                 ; IsCompiled = false
                 ; LibraryName = libName
-                ; LibraryRoot = libRoot
-                ; LibraryPath = CreateTempLibDir libRoot
+                ; LibraryRoot = tmpRoot
+                ; LibraryPath = CreateTempLibDir tmpRoot
                 ; PreludePath = preludePath
                 ; ClooPath = clooPath
-                ; MonoOptionsPath = monoPath
+                ; MonoOptionsPath = monoOptionsPath
                 ; LibraryInstance = null
                 ; LibraryArgs = Array.empty
                 ; ImportFiles = []
@@ -63,7 +65,6 @@ module FSharkMain =
                 [String.Format("(* Start of SourceFile {0} *)", filepath)] @
                 file @
                 [String.Format("(* End of SourceFile {0} *)", filepath)]
-                
             in this.InputFunctions <- Map.add filepath file' this.InputFunctions
             
         default this.AddImportFile filepath = do
@@ -78,22 +79,17 @@ module FSharkMain =
         default this.CompileAndLoad = 
             this.LibraryPath <- CreateTempLibDir this.LibraryRoot
             let srcs = this.ConcatenateSources
-            
-            // write compiled source to some designation
-            
-            // attempt compilation of compiled source, write compilation errors to stdout if mistake and quit.
-            
             let parsedFile = FSharkParser.ParseAndCheckSingleFile(srcs, this.PreludePath)
-            if parsedFile.HasCriticalErrors 
-            then CompilePanic parsedFile.Errors
-            else
+            
+            if not <| Array.isEmpty parsedFile.Errors then CompilePanic parsedFile.Errors            
+            
             let decls = FSharkCompiler.FSharkFromFSharpResults(parsedFile)
             let futharkSrc = FutharkWriter.FSharkDeclsToFuthark decls this.Unsafe
             let futharkPath = this.GetPathWithSuffix this.LibraryPath this.LibraryName "fut"
             let futharkOutPath = this.GetPathWithoutSuffix
             let futharkCSPath = System.IO.Path.ChangeExtension(futharkOutPath, "cs")
             let futharkDLLPath = System.IO.Path.ChangeExtension(futharkOutPath, "dll")
-            this.WriteSourceToPath futharkPath futharkSrc
+            this.WriteSourceToPath futharkSrc futharkPath
             COMPILE_SUCCESS(this.CompileFutharkModule futharkPath this.OpenCL)
             
             this.CompileAndLoadCSModule futharkCSPath futharkDLLPath
@@ -113,48 +109,6 @@ module FSharkMain =
         default this.GetCompiledFunction (fname : string) =
             Map.find fname this.CompiledFunctions
             
-        member private this.CreateInt8Array (data : 'b []) (lens : int64 []) : obj =
-                    let data8 = Array.map unbox<int8> data
-                    in (data8, lens) :> obj
-        
-        member private this.CreateInt16Array (data : 'b []) (lens : int64 []) : obj =
-                    let data16 = Array.map unbox<int16> data
-                    in (data16, lens) :> obj
-                    
-        member private this.CreateInt32Array (data : 'b []) (lens : int64 []) : obj =
-                    let data32 = Array.map unbox<int32> data
-                    in (data32, lens) :> obj
-        
-        member private this.CreateInt64Array (data : 'b []) (lens : int64 []) : obj =
-                    let data64 = Array.map unbox<int64> data
-                    in (data64, lens) :> obj
-                    
-        member private this.CreateUInt8Array (data : 'b []) (lens : int64 []) : obj =
-                    let data8 = Array.map unbox<uint8> data
-                    in (data8, lens) :> obj
-        
-        member private this.CreateUInt16Array (data : 'b []) (lens : int64 []) : obj =
-                    let data16 = Array.map unbox<uint16> data
-                    in (data16, lens) :> obj
-                    
-        member private this.CreateUInt32Array (data : 'b []) (lens : int64 []) : obj =
-                    let data32 = Array.map unbox<uint32> data
-                    in (data32, lens) :> obj
-        
-        member private this.CreateUInt64Array (data : 'b []) (lens : int64 []) : obj =
-                    let data64 = Array.map unbox<uint64> data
-                    in (data64, lens) :> obj
-        member private this.CreateF32Array (data : 'b []) (lens : int64 []) : obj =
-                    let data64 = Array.map unbox<single> data
-                    in (data64, lens) :> obj
-                    
-        member private this.CreateF64Array (data : 'b []) (lens : int64 []) : obj =
-                    let data64 = Array.map unbox<double> data
-                    in (data64, lens) :> obj
-                    
-        member private this.CreateBoolArray (data : 'b []) (lens : int64 []) : obj =
-                    let databool = Array.map unbox<bool> data
-                    in (databool, lens) :> obj
             
         member this.PrepareFSharkInput (variable : obj) : obj =
             let tp = variable.GetType()
@@ -162,61 +116,57 @@ module FSharkMain =
                 let (data, lens) = ArrayToFlatArray (variable :?> System.Array)
                 match GetBottomType (data.[0]) with
                 | "System.Int8" -> 
-                    this.CreateInt8Array data lens
+                    CreateInt8Array data lens
                 | "System.Int16" -> 
-                    this.CreateInt16Array data lens
+                    CreateInt16Array data lens
                 | "System.Int32" -> 
-                    this.CreateInt32Array data lens
+                    CreateInt32Array data lens
                 | "System.Int64" -> 
-                    this.CreateInt64Array data lens
+                    CreateInt64Array data lens
                 | "System.UInt8" -> 
-                    this.CreateUInt8Array data lens
+                    CreateUInt8Array data lens
                 | "System.UInt16" -> 
-                    this.CreateUInt16Array data lens
+                    CreateUInt16Array data lens
                 | "System.UInt32" -> 
-                    this.CreateUInt32Array data lens
+                    CreateUInt32Array data lens
                 | "System.UInt64" -> 
-                    this.CreateUInt64Array data lens
+                    CreateUInt64Array data lens
                 | "System.Single" -> 
-                    this.CreateF32Array data lens
+                    CreateF32Array data lens
                 | "System.Double" -> 
-                    this.CreateF64Array data lens
+                    CreateF64Array data lens
                 | "System.Boolean" -> 
-                    this.CreateBoolArray data lens
+                    CreateBoolArray data lens
                 | what -> failwithf "%s" what
             else    
                 variable
-            
-        member private this.RestoreFlatArray (variable : ('a [] * int64 [])) : obj =
-            let (data, dims) = variable
-            in FlatArrayToFSharkArray data dims
             
         member this.PrepareFSharkOutput (variable : obj) : obj =
             if FSharpType.IsTuple <| variable.GetType()
             then
                 match variable with 
                 | :? (int8 [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (int16 [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (int [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (int64 [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (uint8 [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (uint16 [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (uint32 [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (uint64 [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (single [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (double [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | :? (bool [] * int64[]) as someTuple ->
-                    this.RestoreFlatArray someTuple
+                    RestoreFlatArray someTuple
                 | _ -> this.HandleTupleOutput variable
             else    
                 variable
@@ -289,9 +239,8 @@ module FSharkMain =
                                  
             let imports = String.concat "\n" this.ImportFiles
             let functions = (List.concat << List.map snd << Map.toList) this.InputFunctions
-            let functions' = WrapFunctions functions
-            let top = "namespace FShark"
-            in String.concat "\n" [|top;imports;functions'|]
+            let functions' = String.concat "\n" functions
+            in String.concat "\n" [|imports;functions'|]
             
         member private this.GetPathWithSuffix root libName (suffix : string) : string =
             String.Format("{0}/{1}.{2}", root, libName, suffix)
@@ -299,16 +248,6 @@ module FSharkMain =
         member private this.GetPathWithoutSuffix : string =
             String.Format("{0}/{1}", this.LibraryPath, this.LibraryName)
         
-        member this.FSharkArrayToFlatArray (arr : FSharkArray<'a>) =
-            if not <| this.IsCompiled
-            then failwith "Module needs to be compiled first"
-            let tp = arr.GetType
-            let (data, dims) = FSharkArrayToFlatArray arr
-            in data
-            
-            
-            
-            
         member this.CompileAndLoadFSharpModule (rootEntity : FSharpImplementationFileDeclaration) (filepath : string) : unit =
             let decls = FSharkCompiler.FSharkFromFSharpImplementationFileDeclaration(rootEntity)
             let futharkSrc = FutharkWriter.FSharkDeclsToFuthark decls this.Unsafe
@@ -320,6 +259,3 @@ module FSharkMain =
             COMPILE_SUCCESS(this.CompileFutharkModule futharkFilepath this.OpenCL)
             this.CompileAndLoadCSModule futharkCSPath futharkDLLPath
         end
-            
-        
-    // what about library functions

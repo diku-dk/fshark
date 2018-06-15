@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Benchmarks\LocVolCalib.fs" />
+    <Compile Include="Benchmarks\Nbody.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Filter\Filter1.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Filter\Filter2.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Filter\Filter3.fs" />
