@@ -67,7 +67,9 @@ module IL =
     type FSharkDecl = FSharkVal of bool * FSharkType * Name * Name list list * FSharkCode
                     | FSharkTypeAlias of Name * FSharkType
                     | FSharkRecord of Name * (Name * FSharkType) list
-    
+                    | FSharkModule of Name * FSharkDecl list
+                    | EmptyDecl
+                    
     type FSharkProg = FSharkDecl list
     
     type FSharkTree = Entity of FSharpEntity * FSharkTree list

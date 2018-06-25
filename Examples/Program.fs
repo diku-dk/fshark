@@ -3,6 +3,7 @@ open FShark.Main.FSharkMain
 
 [<EntryPoint>]
 let main argv =
+
     let wrapper = 
         new FSharkMain(
             libName="NBodyExample",

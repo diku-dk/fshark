@@ -1,5 +1,6 @@
 namespace FShark.TestTypes
 
+[<AutoOpen>]
 module TestTypes =
     (* Types we need for parsing the unit tests *)
     type FSharkFun() = inherit System.Attribute()

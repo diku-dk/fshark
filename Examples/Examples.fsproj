@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="srcs\ExampleModule.fs" />
     <Compile Include="srcs\LocVolCalib.fs" />
     <Compile Include="srcs\nbody.fs" />
     <Compile Include="Program.fs" />
