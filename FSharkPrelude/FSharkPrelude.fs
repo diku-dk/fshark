@@ -1,4 +1,5 @@
 namespace FSharkPrelude
+[<AutoOpen>]
 module FSharkPrelude =
     type FSharkEntry() = inherit System.Attribute()
     
