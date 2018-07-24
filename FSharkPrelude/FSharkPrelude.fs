@@ -1,12 +1,4 @@
 namespace FSharkPrelude
-open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
-open Microsoft.FSharp.Core
-open Microsoft.FSharp.Collections
-open Microsoft.FSharp.Core.Operators
-open Microsoft.FSharp.Core.CompilerServices
-open Microsoft.FSharp.Core.LanguagePrimitives.IntrinsicOperators
-open System.Reflection
-
 [<AutoOpen>]
 module FSharkPrelude =
     type FSharkEntry() = inherit System.Attribute()
