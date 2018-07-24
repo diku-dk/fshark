@@ -26,6 +26,7 @@ module FSharkCompiler =
              match tp' with
              | "Int" -> Prim <| Int FInt32
              | "Int8" -> Prim <| Int FInt8
+             | "SByte" -> Prim <| Int FInt8
              | "Int16" -> Prim <| Int FInt16
              | "Int32" -> Prim <| Int FInt32
              | "Int64" -> Prim <| Int FInt64
