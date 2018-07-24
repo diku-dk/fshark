@@ -1,6 +1,7 @@
 namespace FShark.Compiler
 
 module FSharkCompiler = 
+    open System.IO
     open System
     open System.IO
     open FShark.IL.AST
@@ -269,9 +270,9 @@ module FSharkCompiler =
         | "op_UnarySubtraction" -> Some <| FSharkCode.UnaryOp (UnarySub, getFtype tps, args'.[0])
         | "op_UnaryNegation" -> Some <| FSharkCode.UnaryOp (UnaryNeg, getFtype tps, args'.[0])
         | "op_Multiply" -> Some <| FSharkCode.InfixOp (Mul, getFtype tps, args'.[0], args'.[1])
+        | "op_Division" -> Some <| FSharkCode.InfixOp (Div, getFtype tps, args'.[0], args'.[1])
         | "op_Modulus" -> Some <| FSharkCode.InfixOp (Mod, getFtype tps, args'.[0], args'.[1])
         | "op_Exponentiation" -> Some <| FSharkCode.InfixOp (Pow, getFtype tps, args'.[0], args'.[1])
-        | "op_Division" -> Some <| FSharkCode.InfixOp (Div, getFtype tps, args'.[0], args'.[1])
         
         | "op_BooleanAnd" -> Some <| FSharkCode.InfixOp (LAnd, None, args'.[0], args'.[1])
         | "op_BooleanOr" -> Some <| FSharkCode.InfixOp (LOr, None, args'.[0], args'.[1])
@@ -320,12 +321,12 @@ module FSharkCompiler =
             | "Tanh" -> Some <| Tanh args' tps
             | "ToSingle" -> Some <| GetCall"f32.i64" [GetTypedCall tps "to_i64" args']
             | "ToDouble" -> Some <| GetCall"f64.i64" [GetTypedCall tps "to_i64" args']
-            | "ToSByte" -> Some <| GetCall"i8.i64" [GetTypedCall tps "to_i64" args']
-            | "ToByte" -> Some <| GetCall"u8.i64" [GetTypedCall tps "to_i64" args']
-            | "ToInt" -> Some <| GetCall"i32.i64" [GetTypedCall tps "to_i64" args']
-            | "ToInt16" -> Some <| GetCall"i16.i64" [GetTypedCall tps "to_i64" args']
-            | "ToInt32" -> Some <| GetCall"i32.i64" [GetTypedCall tps "to_i64" args']
-            | "ToInt64" -> Some <| GetCall"i64.i64" [GetTypedCall tps "to_i64" args']
+            | "ToSByte"  -> Some <| GetCall"i8.i64"  [GetTypedCall tps "to_i64" args']
+            | "ToByte"   -> Some <| GetCall"u8.i64"  [GetTypedCall tps "to_i64" args']
+            | "ToInt"    -> Some <| GetCall"i32.i64" [GetTypedCall tps "to_i64" args']
+            | "ToInt16"  -> Some <| GetCall"i16.i64" [GetTypedCall tps "to_i64" args']
+            | "ToInt32"  -> Some <| GetCall"i32.i64" [GetTypedCall tps "to_i64" args']
+            | "ToInt64"  -> Some <| GetCall"i64.i64" [GetTypedCall tps "to_i64" args']
             | "ToUInt16" -> Some <| GetCall"u16.i64" [GetTypedCall tps "to_i64" args']
             | "ToUInt32" -> Some <| GetCall"u32.i64" [GetTypedCall tps "to_i64" args']
             | "ToUInt64" -> Some <| GetCall"u64.i64" [GetTypedCall tps "to_i64" args']
@@ -430,15 +431,18 @@ module FSharkCompiler =
             let (field', _) = GetRecordField field
             in FSharkCode.RecordGet(var', field')
         
-    and CompileFSharkEntity (entity : FSharpEntity) subdecls : FSharkDecl list =
+    and CompileFSharkEntity (entity : FSharpEntity) subdecls : FSharkDecl =
         if entity.IsFSharpRecord
-        then [CompileFSharkRecord entity]
+        then CompileFSharkRecord entity
         else 
         if entity.IsFSharpAbbreviation
-        then [CompileFSharkTypeAlias entity]
+        then CompileFSharkTypeAlias entity
         else 
         if entity.IsFSharpModule
-        then List.concat <| List.map TraverseImplementationFile subdecls
+        then 
+            let name = RemovePrefacingUnderscore entity.CompiledName
+            let subdecls' = List.map TraverseImplementationFile subdecls
+            in FSharkDecl.FSharkModule (name, subdecls')
         else failwith "Not supported"
              
     and CompileFSharkRecord (entity: FSharpEntity) : FSharkDecl = 
@@ -456,7 +460,7 @@ module FSharkCompiler =
         let tp = CompileFSharkType field.FieldType
         in (name, tp)
         
-    and TraverseImplementationFile (elm : FSharpImplementationFileDeclaration) : FSharkDecl list =
+    and TraverseImplementationFile (elm : FSharpImplementationFileDeclaration) : FSharkDecl =
             let isEntryAttribute (attribute : FSharpAttribute) : bool =
                 attribute.AttributeType.CompiledName = "FSharkEntry"
                 
@@ -469,28 +473,27 @@ module FSharkCompiler =
                 CompileFSharkEntity entity subDecls
                    
             | FSharpImplementationFileDeclaration.MemberOrFunctionOrValue (v, args, exp) ->
-                if v.IsMember then [] else
+                if v.IsMember then EmptyDecl else
                 let attributes = Seq.toList v.Attributes
-                if List.exists isTestAttribute attributes then [] 
+                if List.exists isTestAttribute attributes then EmptyDecl
                 else 
                     let (name, tp) = GetFSharkVar v
                     let args' = List.map (List.map (fst << GetFSharkVar)) args
                     let exp' = GetFSharkCode exp
                     let isEntry = List.exists isEntryAttribute attributes
-                    [FSharkVal (isEntry, tp, name, args', exp')]
+                    FSharkVal (isEntry, tp, name, args', exp')
                    
             | _ -> raise <| Exception ("This is not root.")
             
     
         
     let FSharkFromFSharpResults (input : FSharpCheckProjectResults) : FSharkDecl list =
-        let entity = input.AssemblyContents.ImplementationFiles.[0].Declarations.[0]
-        match entity with
-        | FSharpImplementationFileDeclaration.Entity(_, subentities) ->
-            let rootDecl = List.last subentities
-            let fsharkDecls = TraverseImplementationFile rootDecl
+        let rootEntity = input.AssemblyContents.ImplementationFiles.[0].Declarations.[0]
+        match rootEntity with
+        | FSharpImplementationFileDeclaration.Entity(_, containedDeclarations) ->
+            let fsharkDecls = List.map TraverseImplementationFile containedDeclarations
             in fsharkDecls 
         | _ -> failwith "This shouldn't happen"
         
     let FSharkFromFSharpImplementationFileDeclaration (rootDecl : FSharpImplementationFileDeclaration) : FSharkDecl list =
-        TraverseImplementationFile rootDecl
+        [TraverseImplementationFile rootDecl]

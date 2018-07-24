@@ -3,6 +3,20 @@ namespace FShark.Library
 module FSharkArrays =
   open System.Text.RegularExpressions
   
+  let rec CheckRegularArray (array : System.Array) : unit =
+      let array0 = array :?> obj []
+      let arrays = array0 |> Array.choose (box >> function
+                                            | :? System.Array as xs -> Some xs
+                                            | _                     -> None
+                                          ) 
+      let lengths = Array.map (Seq.cast >> Seq.length) arrays |> Array.distinct
+      if   arrays .Length  = 0            then ()
+      elif arrays .Length <> array.Length then failwith "Invalid array"
+      elif lengths.Length  > 1            then failwith "Irregular array"
+      else do Array.map CheckRegularArray arrays
+              ()
+              
+              
   // husk at takke Christopher Pritchard og Abe Mieres fra F#-slacken
   let rec ArrayToFlatArray (array : System.Array) = 
       if array.Length = 0 then failwith "Empty array"
@@ -45,3 +59,5 @@ module FSharkArrays =
   let RestoreFlatArray (variable : ('a [] * int64 [])) : obj =
             let (data, dims) = variable
             in FlatArrayToFSharkArray data dims
+            
+  

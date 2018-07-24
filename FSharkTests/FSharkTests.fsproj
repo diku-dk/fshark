@@ -109,6 +109,7 @@
     <Compile Include="UnitTests\FSharkSOACS\Map\Map3.fs" />
     <Compile Include="UnitTests\Identity.fs" />
     <Compile Include="UnitTests\MultidimAccess.fs" />
+    <Compile Include="UnitTests\Operators\Minus.fs" />
     <Compile Include="UnitTests\Operators\Plus.fs" />
     <Compile Include="UnitTests\RangeTest.fs" />
     <Compile Include="UnitTests\SequenceTest.fs" />

@@ -6,6 +6,7 @@ module FutharkWriter =
     open Microsoft.FSharp.Compiler.SourceCodeServices
     open FShark.IL.AST
     open FShark.IL.IL
+    open Internal.Utilities.StructuredFormat.TaggedTextOps
     open YC.PrettyPrinter
     open YC.PrettyPrinter.Doc
     open YC.PrettyPrinter.Pretty
@@ -213,9 +214,9 @@ module FutharkWriter =
         | Some tp -> PrettyPrintFSharkType tp >|< wordL "."
     
     
+    let StackDocs (docs : Doc list) : Doc = List.reduce (@@) docs
     
-    
-    let PrettyPrintFSharkDecl (unsafe : bool) (decl : FSharkDecl) : Doc =
+    let rec PrettyPrintFSharkDecl (unsafe : bool) (decl : FSharkDecl) : Doc =
         match decl with
         | FSharkVal (isEntry, FSharkFunction(argtypes, ret), name, args, body) ->
             let zippedArgs = List.zip args <| List.take (List.length args) argtypes
@@ -243,7 +244,16 @@ module FutharkWriter =
             let fields' = braceL(commaListL <| List.map pprField fields)
             in wordL "type" >||< wordL name >||< wordL "=" >||< fields'
             
+        | FSharkModule(name, decls) ->
+            let decls' = List.map (PrettyPrintFSharkDecl unsafe) decls
+            //in wordL "module" >||< wordL name >||< wordL "=" @@-- (braceL <| StackDocs decls')
+            in StackDocs decls'
+            
+        | EmptyDecl -> emptyL
+            
         | _ -> failwith "unmatched FSharkDecl" 
+    
+    
     
     let FSharkDeclsToFuthark (decls : FSharkDecl list) (unsafe : bool) : string =
         let decls' = List.reduce (@@) <| List.map (PrettyPrintFSharkDecl unsafe) decls
