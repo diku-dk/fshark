@@ -173,9 +173,8 @@ module FutharkWriter =
         | FSharkBinOp.PipeL -> e1' >||< bracketL(e2')
         | FSharkBinOp.PipeR -> e2' >||< bracketL(e1')
         | _ ->
-            let tp' = PrettyPrintFSharkTypeOption tp
             let p' = PrettyPrintFSharkInfixOp p
-            in bracketL(e1' >||< tp' >|< p' >||< e2')
+            in bracketL(e1' >||< p' >||< e2')
     
     and PrettyPrintFSharkInfixOp (p : FSharkBinOp) : Doc =
         let symbol = match p with
