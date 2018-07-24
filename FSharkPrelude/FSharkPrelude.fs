@@ -375,7 +375,7 @@ module FSharkPrelude =
         let res8 = Array.zeroCreate len
         let res9 = Array.zeroCreate len
         for i = 0 to xs.Length-1 do
-            let (a,b,c,d,e,f,g,h,i) = xs.[i]
+            let (a,b,c,d,e,f,g,h,i') = xs.[i]
             res1.[i] <- a
             res2.[i] <- b
             res3.[i] <- c
@@ -384,7 +384,7 @@ module FSharkPrelude =
             res6.[i] <- f
             res7.[i] <- g
             res8.[i] <- h
-            res9.[i] <- i
+            res9.[i] <- i'
         res1, res2, res3, res4, res5, res6, res7, res8, res9
             
     let  Unzip10 (xs : ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j) array)
@@ -401,7 +401,7 @@ module FSharkPrelude =
         let res9 = Array.zeroCreate len
         let res10 = Array.zeroCreate len
         for i = 0 to xs.Length-1 do
-            let (a,b,c,d,e,f,g,h,i,j) = xs.[i]
+            let (a,b,c,d,e,f,g,h,i',j) = xs.[i]
             res1.[i] <- a
             res2.[i] <- b
             res3.[i] <- c
@@ -410,7 +410,7 @@ module FSharkPrelude =
             res6.[i] <- f
             res7.[i] <- g
             res8.[i] <- h
-            res9.[i] <- i
+            res9.[i] <- i'
             res10.[i] <- j
         res1, res2, res3, res4, res5, res6, res7, res8, res9, res10
 
