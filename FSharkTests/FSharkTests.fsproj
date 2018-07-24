@@ -109,7 +109,15 @@
     <Compile Include="UnitTests\FSharkSOACS\Map\Map3.fs" />
     <Compile Include="UnitTests\Identity.fs" />
     <Compile Include="UnitTests\MultidimAccess.fs" />
+    <Compile Include="UnitTests\Operators\Div.fs" />
+    <Compile Include="UnitTests\Operators\Eq.fs" />
+    <Compile Include="UnitTests\Operators\Geq.fs" />
+    <Compile Include="UnitTests\Operators\Greater.fs" />
+    <Compile Include="UnitTests\Operators\Leq.fs" />
+    <Compile Include="UnitTests\Operators\Less.fs" />
     <Compile Include="UnitTests\Operators\Minus.fs" />
+    <Compile Include="UnitTests\Operators\Mod.fs" />
+    <Compile Include="UnitTests\Operators\Neq.fs" />
     <Compile Include="UnitTests\Operators\Plus.fs" />
     <Compile Include="UnitTests\RangeTest.fs" />
     <Compile Include="UnitTests\SequenceTest.fs" />
