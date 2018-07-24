@@ -13,5 +13,3 @@ let value = [|4y; 4s; 4; 4L; 4.0f; 4.0|] : obj array
 [<FSharkOutput>]
 let sameValue = (7y, 7s, 7, 7L, 7.0f, 7.0) : (int8 * int16 * int * int64 * single * double)
 
-[<FSharkConvertion>]
-let conv (x : obj) = downcast x : int
