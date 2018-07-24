@@ -53,3 +53,6 @@ module Utils =
             let variable' = (variable :?> 'a [])
             in GetBottomType <| Array.head variable'
         else variable.GetType().ToString()
+        
+    let TicksToMicroseconds (ticks : int64) : int64 =
+        ticks * (int64 1000000) / Stopwatch.Frequency

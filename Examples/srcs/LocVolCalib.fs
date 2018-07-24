@@ -1,6 +1,5 @@
 namespace LocVolCalib
 open FSharkPrelude.FSharkPrelude
-open FShark.TestTypes.TestTypes
 module LocVolCalib =
     let initGrid (s0: float32) (alpha: float32) (nu: float32) (t: float32) (numX: int) (numY: int) (numT: int)
       : (int * int * float32 array * float32 array * float32 array) =

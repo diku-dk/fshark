@@ -9,11 +9,10 @@ module Program =
         new FSharkMain(
         "Internal",
         "/home/mikkel/FShark",
-        "/home/mikkel/Cloo.clSharp.dll",
-        "/home/mikkel/Mono.Options.dll",
         "/home/mikkel/Documents/FShark/FSharkPrelude/bin/Debug/FSharkPrelude.dll",
          true,
-         false
+         false,
+         true
         )
         
     let nbodyTest =

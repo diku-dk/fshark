@@ -313,8 +313,7 @@ module FSharkCompiler =
             | "Atan2" -> Some <| GetTypedCall tps "atan2" args'
             | "Cos" -> Some <| GetTypedCall tps "cos" args'
             | "Sin" -> Some <| GetTypedCall tps "sin" args'
-            | "Tan" -> Some <| Tan args' tps
-            | "Ceiling" -> Some <| GetTypedCall tps "ceil" args'
+            | "Tan" -> Some <| GetTypedCall tps "tan" args'
             | "Compare" -> Some <| Compare args' tps
             | "Sinh" -> Some <| Sinh args' tps
             | "Cosh" -> Some <| Cosh args' tps
@@ -333,9 +332,10 @@ module FSharkCompiler =
             
             | "Exp" -> Some <| GetTypedCall tps "exp" args'
             | "Log" -> Some <| GetTypedCall tps "log" args'
-            | "Log10" -> Some <| Log10 args' tps
+            | "Log10" -> Some <| GetTypedCall tps "log10" args'
     
             | "Floor" -> Some <| GetTypedCall tps "floor" args'
+            | "Ceiling" -> Some <| GetTypedCall tps "ceil" args'
             | "Round" -> Some <| GetTypedCall tps "round" args'
             | "Truncate" -> Some <| GetTypedCall tps "trunc" args'
             | "Fst" -> Some <| FSharkCode.TupleGet(List.head args', 1)
@@ -361,12 +361,8 @@ module FSharkCompiler =
         | _ -> failwith "eh"
         
     and Sinh args tps : FSharkCode =
-        let ex = FSharkCode.InfixOp(Pow, Some <| getFtype tps,
-                                         GetTypedCall tps "e" [],
-                                         List.head args)
-        let enegx = FSharkCode.InfixOp(Pow, Some <| getFtype tps,
-                                         GetTypedCall tps "e" [],
-                                         FSharkCode.UnaryOp(UnarySub, Some <| getFtype tps, List.head args))
+        let ex = GetTypedCall tps "exp" [List.head args]
+        let enegx = GetTypedCall tps "exp" [FSharkCode.UnaryOp(UnarySub, Some <| getFtype tps, List.head args)]
                                          
         let explusenegx = FSharkCode.InfixOp(Sub, Some <| getFtype tps, ex, enegx)
         in FSharkCode.InfixOp(Div, Some <| getFtype tps, explusenegx, FSharkCode.Const((upcast 2 : obj), getFtype tps))
@@ -413,14 +409,7 @@ module FSharkCompiler =
         then 
             let fname = RemovePrefacingUnderscore f.CompiledName
             let args' = List.map GetFSharkCode args
-            let fname' = match fname with
-                         | Prefix "Map" rest -> "map" + rest
-                         | Prefix "Zip" _ -> "zip"
-                         | Prefix "Unzip" _ -> "unzip"
-                         | funName -> funName.ToLower() (* make sure to name FShark functions
-                                                         * after their corresponding Futhark functions
-                                                         *)
-        
+            let fname' = fname.ToLower()
             in Some <| FSharkCode.SOAC(fname', List.head args', List.tail args')
         else None
         // expand here with check on whether we are using a generic function with specific typed type params

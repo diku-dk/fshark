@@ -15,6 +15,7 @@ open FShark.Library.ObjectWrappers
 
 
 module FSharkMain =
+    exception Error of string
     type FSharkMain = class
         val mutable InputFunctions : Map<string,string list>
         val mutable CompiledFunctions : Map<string,MethodInfo>
@@ -24,12 +25,12 @@ module FSharkMain =
         val mutable LibraryRoot : string
         val mutable LibraryPath : string
         val mutable PreludePath : string
-        val mutable MonoOptionsPath : string
-        val mutable ClooPath : string
         val mutable LibraryInstance : obj
         val mutable LibraryArgs : string array
         val mutable ImportFiles : string list
         val mutable Unsafe : bool
+        val mutable Debug : bool
+        val mutable MONO_PATH : string
         abstract member AddSourceFile : string -> unit
         abstract member AddImportFile : string -> unit
         
@@ -39,24 +40,29 @@ module FSharkMain =
         abstract member GetCompiledFunction  : string -> MethodInfo
         abstract member InvokeFunction<'T> : string -> obj[] -> obj
         
-        new ((libName:string),(tmpRoot : string),(clooPath : string),
-            (monoOptionsPath : string),(preludePath : string),(openCL : bool), 
-            (unsafe : bool)) =
-                { InputFunctions = Map.empty
-                ; CompiledFunctions = Map.empty
-                ; IsCompiled = false
-                ; LibraryName = libName
-                ; LibraryRoot = tmpRoot
-                ; LibraryPath = CreateTempLibDir tmpRoot
-                ; PreludePath = preludePath
-                ; ClooPath = clooPath
-                ; MonoOptionsPath = monoOptionsPath
-                ; LibraryInstance = null
-                ; LibraryArgs = Array.empty
-                ; ImportFiles = []
-                ; OpenCL = openCL
-                ; Unsafe = unsafe
-                }
+        new ((libName:string),
+             (tmpRoot : string),
+             (preludePath : string),
+             (openCL : bool),
+             (unsafe : bool),
+             (debug : bool)) =
+            let mono_path = Environment.GetEnvironmentVariable("MONO_PATH")
+            if mono_path = "" then failwith "Could not find environment variable MONO_PATH"
+            { InputFunctions = Map.empty
+            ; CompiledFunctions = Map.empty
+            ; IsCompiled = false
+            ; LibraryName = libName
+            ; LibraryRoot = tmpRoot
+            ; LibraryPath = CreateTempLibDir tmpRoot
+            ; PreludePath = preludePath
+            ; LibraryInstance = null
+            ; LibraryArgs = Array.empty
+            ; ImportFiles = []
+            ; OpenCL = openCL
+            ; Unsafe = unsafe
+            ; Debug = debug
+            ; MONO_PATH = mono_path
+            }
             
             
         default this.AddSourceFile filepath : unit = do
@@ -77,22 +83,49 @@ module FSharkMain =
             in this.ImportFiles <- List.append this.ImportFiles file'
             
         default this.CompileAndLoad = 
+            let pipelineWatch = new Stopwatch()
+            pipelineWatch.Start()
             this.LibraryPath <- CreateTempLibDir this.LibraryRoot
             let srcs = this.ConcatenateSources
+            let watch = new Stopwatch()
+            watch.Start()
             let parsedFile = FSharkParser.ParseAndCheckSingleFile(srcs, this.PreludePath)
+            watch.Stop()
+            if this.Debug then 
+                printfn "FShark parsing took %i ms" <| TicksToMicroseconds watch.ElapsedTicks
             
             if not <| Array.isEmpty parsedFile.Errors then CompilePanic parsedFile.Errors            
             
+            watch.Restart()
             let decls = FSharkCompiler.FSharkFromFSharpResults(parsedFile)
+            watch.Stop()
+            if this.Debug then 
+                printfn "FSharpDecls to FSharkIL took %i ms" <| TicksToMicroseconds watch.ElapsedTicks
+                
+            watch.Restart()
             let futharkSrc = FutharkWriter.FSharkDeclsToFuthark decls this.Unsafe
+            watch.Stop()
+            if this.Debug then 
+                printfn "FSharkIL to Futhark source code took %i ms" <| TicksToMicroseconds watch.ElapsedTicks
+            
+            
             let futharkPath = this.GetPathWithSuffix this.LibraryPath this.LibraryName "fut"
             let futharkOutPath = this.GetPathWithoutSuffix
             let futharkCSPath = System.IO.Path.ChangeExtension(futharkOutPath, "cs")
             let futharkDLLPath = System.IO.Path.ChangeExtension(futharkOutPath, "dll")
             this.WriteSourceToPath futharkSrc futharkPath
-            COMPILE_SUCCESS(this.CompileFutharkModule futharkPath this.OpenCL)
             
+            watch.Restart()
+            COMPILE_SUCCESS(this.CompileFutharkModule futharkPath this.OpenCL)
+            watch.Stop()
+            if this.Debug then 
+                printfn "Compiling the Futhark module into .cs source code took %i ms" <| TicksToMicroseconds watch.ElapsedTicks
+                
             this.CompileAndLoadCSModule futharkCSPath futharkDLLPath
+            
+            pipelineWatch.Stop()
+            if this.Debug then 
+                printfn "The entire FShark compilation pipeline took %i ms" <| TicksToMicroseconds pipelineWatch.ElapsedTicks
         
         member this.WriteSourceToPath (source:string) (path:string) =
             System.IO.File.WriteAllText(path, source)
@@ -182,7 +215,26 @@ module FSharkMain =
         default this.InvokeFunction(str : string) (parameters : obj array) =
             let parameters' = (Array.map this.PrepareFSharkInput) parameters
             let (method : MethodInfo) = this.GetCompiledFunction str
+            let watch = new Stopwatch()
+            if this.Debug then 
+                let foo = fun i ->
+                    watch.Restart()
+                    ignore <| method.Invoke(this.LibraryInstance, parameters')
+                    watch.Stop()
+                    TicksToMicroseconds watch.ElapsedTicks
+                    
+                // if OpenCL we repeat the test to ensure warm cache
+                let iterations = if this.OpenCL then 10 else 1
+                let runtime_list = List.map foo [0..iterations]
+                let sum = List.sum runtime_list
+                let average = sum / int64 runtime_list.Length
+                printfn "Average invokation time was %i ms" average
+                
+            watch.Restart()
             let result = method.Invoke(this.LibraryInstance, parameters')
+            watch.Stop()
+            if this.Debug then 
+                printfn "Invoking %s took %i ms" str (TicksToMicroseconds watch.ElapsedTicks)
             let result' = this.PrepareFSharkOutput result
             in result'
             
@@ -190,22 +242,24 @@ module FSharkMain =
             COMPILE_SUCCESS(this.CompileCSharpModule sourcePath targetPath)
         
         member private this.CompileAndLoadCSModule (sourcePath : string) (targetPath : string) : unit =
+            let cs_watch = new Stopwatch()
+                
+            cs_watch.Start()
             this.CompileCSModule sourcePath targetPath
-            this.CopyExternalLibsToDir
+            cs_watch.Stop()
+            if this.Debug then 
+                printfn "Compiling .cs module took %i ms" (TicksToMicroseconds cs_watch.ElapsedTicks)
+                
             this.IsCompiled <- true
+            cs_watch.Restart()
             this.LoadCompiledModule(targetPath) 
-             
-        member private this.CopyExternalLibsToDir : unit =
-            let copyFile file targetDir =
-                let targetFile = String.Format("{0}/{1}", targetDir, System.IO.Path.GetFileName(file))
-                if not <| System.IO.File.Exists(targetFile)
-                then System.IO.File.Copy(file, targetFile)
-            copyFile this.ClooPath this.LibraryPath
-            copyFile this.MonoOptionsPath this.LibraryPath
+            cs_watch.Stop()
+            if this.Debug then 
+                printfn "Loading compiled .cs assembly using reflection took %i ms" (TicksToMicroseconds cs_watch.ElapsedTicks)
              
         member private this.LoadCompiledModule (module_path : string) : unit =
             let compiledassembly = Assembly.LoadFile(module_path)
-            let compiled_module = compiledassembly.GetType(this.LibraryName)
+            let compiled_module = compiledassembly.GetType(String.concat "." [this.LibraryName; this.LibraryName])
             this.LibraryInstance <- Activator.CreateInstance(compiled_module, this.LibraryArgs)
             let compiled_methods = Array.toList <| compiled_module.GetMethods()
             ignore <| List.map (fun (method : MethodInfo) -> do
@@ -217,9 +271,9 @@ module FSharkMain =
                           this.LibraryName, 
                           str)
                           
-        member private this.CompileCSharpModule filepath outpath =
-            let arguments = String.Format("{3} -target:library -out:{0} -r:{1} -r:{2} /unsafe", 
-                                          outpath, this.ClooPath, this.MonoOptionsPath, filepath)
+        member private this.CompileCSharpModule cspath outpath =
+            let arguments = String.Format("{0} -target:library -out:{1} -lib:{2} -r:Mono.Options.dll -r:Cloo.clSharp.dll /unsafe", 
+                                          cspath, outpath, this.MONO_PATH)
             RunProgram "csc" arguments
             
         member private this.CompileFutharkModule filepath (opencl : bool) =

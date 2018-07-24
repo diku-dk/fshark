@@ -63,19 +63,19 @@ module Main =
       let steps = Iota n_steps
       in Foldr (fun _ bodies' -> advance_bodies epsilon time_step bodies') bodies steps
     
-    let wrap_body (posx : single) (posy : single) (posz : single) (mass : single) (velx : single)
-                  (vely : single) (velz : single) (accx : single) (accy : single) (accz : single)
+    let wrap_body (posx : single ) ( posy : single ) ( posz : single) (mass : single) 
+                  (velx : single ) ( vely : single ) ( velz : single) (accx : single ) ( accy : single ) ( accz : single)
                   : body =
       {position={x=posx; y=posy; z=posz};
        mass=mass;
        velocity={x=velx; y=vely; z=velz};
        acceleration={x=accx; y=accy; z=accz}}
     
-    let unwrap_body (b: body): (single * single * single * single * single * single * single * single * single * single) =
-      (b.position.x, b.position.y, b.position.z,
-       b.mass,
-       b.velocity.x, b.velocity.y, b.velocity.z,
-       b.acceleration.x, b.acceleration.y, b.acceleration.z)
+    let unwrap_body (b: body): ((single * single * single) * single * (single * single * single) * (single * single * single)) =
+      ((b.position.x, b.position.y, b.position.z), 
+        b.mass, 
+        (b.velocity.x, b.velocity.y, b.velocity.z), 
+        (b.acceleration.x, b.acceleration.y, b.acceleration.z))
     
     [<FSharkEntry>]
     let main (n_steps : int) (epsilon : single) (time_step : single) 
@@ -84,12 +84,13 @@ module Main =
              (xas : single array) (yas : single array) (zas : single array)
              : ((single array * single array * single array * single array) * (single array * single array * single array) * (single array * single array * single array)) =
              
-      let bodies  = Map (fun (x,y,z,m,xv,yv,zv,xa,ya,za) -> 
-                      wrap_body x y z m xv yv zv xa ya za
-                    ) <| Zip10 xps yps zps ms xvs yvs zvs xas yas zas
+      let bodies  = Map4 (fun (xp,yp,zp) m (xv, yv, zv) (xa,ya,za) -> wrap_body xp yp zp m xv yv zv xa ya za) (Zip3 xps yps zps) ms (Zip3 xvs yvs zvs) (Zip3 xas yas zas)
       let bodies' = advance_bodies_steps n_steps epsilon time_step bodies
       let bodies'' = Map unwrap_body (bodies')
-      let (xps,yps,zps,ms,xvs,yvs,zvs,xas,yas,zas) = Unzip10 bodies''
+      let (ps,ms,vs,acs) = Unzip4 bodies''
+      let (xps, yps, zps) = Unzip3 ps
+      let (xvs, yvs, zvs) = Unzip3 vs
+      let (xas, yas, zas) = Unzip3 acs
       in ((xps, yps, zps, ms), (xvs, yvs, zvs), (xas, yas, zas))
     
     let rotatePointByMatrix (rotation: single array array) (p: position): position =

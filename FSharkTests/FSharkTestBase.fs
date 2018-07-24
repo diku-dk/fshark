@@ -132,7 +132,7 @@ module TestBase =
                 with 
                     | ex -> printfn "%s" ex.Message; None
             stopWatch.Stop()
-            printfn "FShark took %f milliseconds." stopWatch.Elapsed.TotalMilliseconds
+            printfn "FShark took %d microseconds." <| FShark.Library.Utils.TicksToMicroseconds stopWatch.ElapsedTicks
             match fsharkTestResult with
             | None -> false
             | Some fsharkTestResult' ->
@@ -140,7 +140,7 @@ module TestBase =
             let stopWatch2 = System.Diagnostics.Stopwatch.StartNew()
             let nativeTestResult = testFun.Invoke(0, testInput)
             stopWatch2.Stop()
-            printfn "Native took %f milliseconds." stopWatch2.Elapsed.TotalMilliseconds
+            printfn "Native took %d microseconds." <| FShark.Library.Utils.TicksToMicroseconds stopWatch2.ElapsedTicks
             let testOK = 
                 fsharkTestResult' = nativeTestResult &&
                 testOutput = nativeTestResult
