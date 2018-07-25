@@ -14,6 +14,7 @@ open FShark.Library.FSharkArrays
 open FShark.Library.ObjectWrappers
 
 
+[<AutoOpen>]
 module FSharkMain =
     exception Error of string
     type FSharkMain = class
@@ -33,10 +34,10 @@ module FSharkMain =
         val mutable MONO_PATH : string
         abstract member AddSourceFile : string -> unit
         abstract member AddImportFile : string -> unit
-        
+
         abstract member CompileAndLoad : unit
         abstract member CompileFunctions : unit
-        
+
         abstract member GetCompiledFunction  : string -> MethodInfo
         abstract member InvokeFunction<'T> : string -> obj[] -> obj
         

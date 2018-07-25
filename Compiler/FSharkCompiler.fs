@@ -483,11 +483,11 @@ module FSharkCompiler =
                     let exp' = GetFSharkCode exp
                     let isEntry = List.exists isEntryAttribute attributes
                     FSharkVal (isEntry, tp, name, args', exp')
-                   
+            | FSharpImplementationFileDeclaration.InitAction(_) -> raise <| Exception ("InitActions are not supported in FShark.")
             | _ -> raise <| Exception ("This is not root.")
-            
-    
-        
+
+
+
     let FSharkFromFSharpResults (input : FSharpCheckProjectResults) : FSharkDecl list =
         let rootEntity = input.AssemblyContents.ImplementationFiles.[0].Declarations.[0]
         match rootEntity with
@@ -495,6 +495,6 @@ module FSharkCompiler =
             let fsharkDecls = List.map TraverseImplementationFile containedDeclarations
             in fsharkDecls 
         | _ -> failwith "This shouldn't happen"
-        
+
     let FSharkFromFSharpImplementationFileDeclaration (rootDecl : FSharpImplementationFileDeclaration) : FSharkDecl list =
         [TraverseImplementationFile rootDecl]

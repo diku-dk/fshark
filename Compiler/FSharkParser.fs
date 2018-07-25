@@ -5,9 +5,9 @@ module FSharkParser =
     open System.IO
     open Microsoft.FSharp.Compiler.SourceCodeServices
     open FShark.IL
-    
-    let ParseAndCheckSingleFile(fsharpString : string, fsharkLibPath : string) : FSharpCheckProjectResults = 
-        let file = Path.ChangeExtension(System.IO.Path.GetTempFileName(), "fsx")  
+
+    let ParseAndCheckSingleFile(fsharpString : string, fsharkLibPath : string) : FSharpCheckProjectResults =
+        let file = Path.ChangeExtension(System.IO.Path.GetTempFileName(), "fsx")
         File.WriteAllText(file, fsharpString)
         // Get context representing a stand-alone (script) file
         let checker = FSharpChecker.Create(keepAssemblyContents=true)
