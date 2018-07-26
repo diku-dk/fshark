@@ -102,7 +102,7 @@ let main argv =
         )
         
         let ((xps, yps, zps, ms), (xvs, yvs,zvs), (xas, yas, zas)) = 
-            wrapper.InvokeFunction "mains" nbodyInput :?> (
+            wrapper.InvokeFunction("mains", nbodyInput) :?> (
                     (single array * single array * single array * single array) *
                     (single array * single array * single array) *
                     (single array * single array * single array))
