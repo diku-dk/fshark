@@ -39,7 +39,6 @@ module FSharkMain =
         abstract member CompileFunctions : unit
 
         abstract member GetCompiledFunction  : string -> MethodInfo
-        abstract member InvokeFunction<'T> : string -> obj[] -> obj
         
         new ((libName:string),
              (tmpRoot : string),
@@ -213,7 +212,7 @@ module FSharkMain =
             let tupleFields' = Array.map this.PrepareFSharkOutput tupleFields
             in FSharpValue.MakeTuple(tupleFields', tupleType)
             
-        default this.InvokeFunction(str : string) (parameters : obj array) =
+        member this.InvokeFunction(str : string, [<ParamArray>] parameters : Object[]) =
             let parameters' = (Array.map this.PrepareFSharkInput) parameters
             let (method : MethodInfo) = this.GetCompiledFunction str
             let watch = new Stopwatch()

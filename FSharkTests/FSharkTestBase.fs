@@ -128,7 +128,7 @@ module TestBase =
             let stopWatch = System.Diagnostics.Stopwatch.StartNew()
             let fsharkTestResult = 
                 try 
-                    Some <| this.fsharkMain.InvokeFunction testDict.entryName testInput
+                    Some <| this.fsharkMain.InvokeFunction(testDict.entryName, testInput)
                 with 
                     | ex -> printfn "%s" ex.Message; None
             stopWatch.Stop()
