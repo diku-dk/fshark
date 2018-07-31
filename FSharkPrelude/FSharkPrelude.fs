@@ -463,12 +463,12 @@ module FSharkPrelude =
         in Array.map (curry f) xs
 
     let Reduce (op: 'a -> 'a -> 'a) (neutral : 'a) (xs : 'a array) =
-        let xs' = Array.append [|neutral|] xs
-        in Array.reduce op xs'
+        if Array.isEmpty xs then neutral
+        else Array.reduce op xs
 
     let Reduce_Comm (op: 'a -> 'a -> 'a) (neutral : 'a) (xs : 'a array) =
-        let xs' = Array.append [|neutral|] xs
-        in Array.reduce op xs'
+        if Array.isEmpty xs then neutral
+        else Array.reduce op xs
 
     let Scan (op: 'a -> 'a -> 'a) (neutral : 'a) (xs : 'a array) : 'a array =
         (Array.tail << Array.scan op neutral) xs
