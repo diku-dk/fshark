@@ -4,7 +4,8 @@ open FShark.TestTypes.TestTypes
 open System
 
 [<FSharkEntry>]
-let sqrt (a : single) (b : single) (c : double) (d : double) : (single * single * double * double) = id v
+let sqrt (a : single) (b : single) (c : double) (d : double) : (single * single * double * double) = 
+    (sqrt a,sqrt b,sqrt c,sqrt d)
  
 [<FSharkInput>]
 let value = [|4.0f; 50.0f; 4.0; 50.0 |] : obj array

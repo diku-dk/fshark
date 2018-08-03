@@ -109,6 +109,9 @@
     <Compile Include="UnitTests\FSharkSOACS\Map\Map2.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Map\Map3.fs" />
     <Compile Include="UnitTests\Identity.fs" />
+    <Compile Include="UnitTests\MathFuns\Abs.fs" />
+    <Compile Include="UnitTests\MathFuns\Acos.fs" />
+    <Compile Include="UnitTests\MathFuns\Asin.fs" />
     <Compile Include="UnitTests\MathFuns\Sqrt.fs" />
     <Compile Include="UnitTests\MathFuns\Id.fs" />
     <Compile Include="UnitTests\MultidimAccess.fs" />
