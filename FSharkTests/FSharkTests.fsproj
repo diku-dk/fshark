@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Benchmarks\LocVolCalib.fs" />
     <Compile Include="Benchmarks\Nbody.fs" />
+    <Compile Include="UnitTests\Convertions\Div.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Filter\Filter1.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Filter\Filter2.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Filter\Filter3.fs" />
@@ -108,6 +109,8 @@
     <Compile Include="UnitTests\FSharkSOACS\Map\Map2.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Map\Map3.fs" />
     <Compile Include="UnitTests\Identity.fs" />
+    <Compile Include="UnitTests\MathFuns\Sqrt.fs" />
+    <Compile Include="UnitTests\MathFuns\Id.fs" />
     <Compile Include="UnitTests\MultidimAccess.fs" />
     <Compile Include="UnitTests\Operators\Div.fs" />
     <Compile Include="UnitTests\Operators\Eq.fs" />
@@ -119,6 +122,7 @@
     <Compile Include="UnitTests\Operators\Mod.fs" />
     <Compile Include="UnitTests\Operators\Neq.fs" />
     <Compile Include="UnitTests\Operators\Plus.fs" />
+    <Compile Include="UnitTests\Operators\Range.fs" />
     <Compile Include="UnitTests\RangeTest.fs" />
     <Compile Include="UnitTests\SequenceTest.fs" />
     <Compile Include="UnitTests\Tuple1.fs" />
