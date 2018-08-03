@@ -109,6 +109,10 @@
     <Compile Include="UnitTests\FSharkSOACS\Map\Map2.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Map\Map3.fs" />
     <Compile Include="UnitTests\Identity.fs" />
+    <Compile Include="UnitTests\InlinedFuns\Compare.fs" />
+    <Compile Include="UnitTests\InlinedFuns\Cosh.fs" />
+    <Compile Include="UnitTests\InlinedFuns\Sinh.fs" />
+    <Compile Include="UnitTests\InlinedFuns\Tanh2.fs" />
     <Compile Include="UnitTests\MathFuns\Abs.fs" />
     <Compile Include="UnitTests\MathFuns\Acos.fs" />
     <Compile Include="UnitTests\MathFuns\Asin.fs" />
@@ -149,9 +153,6 @@
       <Project>{5f632ce3-0988-4696-aa80-5b562232618d}</Project>
       <Name>FShark</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UnitTests\InlinedFuns" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
 </Project>
