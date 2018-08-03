@@ -139,6 +139,10 @@
     <Compile Include="UnitTests\Operators\Plus.fs" />
     <Compile Include="UnitTests\Operators\Range.fs" />
     <Compile Include="UnitTests\RangeTest.fs" />
+    <Compile Include="UnitTests\Rounding\Ceil.fs" />
+    <Compile Include="UnitTests\Rounding\Floor.fs" />
+    <Compile Include="UnitTests\Rounding\Round.fs" />
+    <Compile Include="UnitTests\Rounding\Trunc.fs" />
     <Compile Include="UnitTests\SequenceTest.fs" />
     <Compile Include="UnitTests\Tuple1.fs" />
     <Compile Include="UnitTests\TupleNaming.fs" />
