@@ -1,17 +1,17 @@
-module Cos
+module Sin
 open FSharkPrelude.FSharkPrelude
 open FShark.TestTypes.TestTypes
 open System
 
 [<FSharkEntry>]
-let coss (x : single) (y : double) : (single * single * double * double) =
-    (cos x, 
-     cos <| - x, 
-     cos y, 
-     cos <| - y)
+let sinn (x : single) (y : double) : (single * single * double * double) =
+    (sin x, 
+     sin <| - x, 
+     sin y, 
+     sin <| - y)
 
 [<FSharkInput>]
-let value = [|3.14159f; 3.14159|] : obj array
+let value = [|45.0f; 45.0|] : obj array
 
 [<FSharkOutput>]
-let sameValue = (-1.000f, -1.000f, -1.000, -1.000) : (single * single * double * double)
+let sameValue = (0.8509f, -0.8509f, 0.8509, -0.8509) : (single * single * double * double)

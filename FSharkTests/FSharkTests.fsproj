@@ -112,8 +112,13 @@
     <Compile Include="UnitTests\MathFuns\Abs.fs" />
     <Compile Include="UnitTests\MathFuns\Acos.fs" />
     <Compile Include="UnitTests\MathFuns\Asin.fs" />
+    <Compile Include="UnitTests\MathFuns\Atan.fs" />
+    <Compile Include="UnitTests\MathFuns\Atan2.fs" />
+    <Compile Include="UnitTests\MathFuns\Cos.fs" />
+    <Compile Include="UnitTests\MathFuns\Sin.fs" />
     <Compile Include="UnitTests\MathFuns\Sqrt.fs" />
     <Compile Include="UnitTests\MathFuns\Id.fs" />
+    <Compile Include="UnitTests\MathFuns\Tan.fs" />
     <Compile Include="UnitTests\MultidimAccess.fs" />
     <Compile Include="UnitTests\Operators\Div.fs" />
     <Compile Include="UnitTests\Operators\Eq.fs" />
@@ -144,6 +149,9 @@
       <Project>{5f632ce3-0988-4696-aa80-5b562232618d}</Project>
       <Name>FShark</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UnitTests\InlinedFuns" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
 </Project>
