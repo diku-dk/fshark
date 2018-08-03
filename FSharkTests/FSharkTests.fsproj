@@ -119,6 +119,9 @@
     <Compile Include="UnitTests\MathFuns\Atan.fs" />
     <Compile Include="UnitTests\MathFuns\Atan2.fs" />
     <Compile Include="UnitTests\MathFuns\Cos.fs" />
+    <Compile Include="UnitTests\MathFuns\Exp.fs" />
+    <Compile Include="UnitTests\MathFuns\Log.fs" />
+    <Compile Include="UnitTests\MathFuns\Log10.fs" />
     <Compile Include="UnitTests\MathFuns\Sin.fs" />
     <Compile Include="UnitTests\MathFuns\Sqrt.fs" />
     <Compile Include="UnitTests\MathFuns\Id.fs" />
