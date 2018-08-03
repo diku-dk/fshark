@@ -4,7 +4,7 @@ open FShark.TestTypes.TestTypes
 open System
 
 [<FSharkEntry>]
-let id (v : int) : int = id v
+let idd (v : int) : int = id v
  
 [<FSharkInput>]
 let value = [|5|] : obj array

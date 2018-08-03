@@ -122,6 +122,9 @@
     <Compile Include="UnitTests\MathFuns\Exp.fs" />
     <Compile Include="UnitTests\MathFuns\Log.fs" />
     <Compile Include="UnitTests\MathFuns\Log10.fs" />
+    <Compile Include="UnitTests\MathFuns\Max.fs" />
+    <Compile Include="UnitTests\MathFuns\Min.fs" />
+    <Compile Include="UnitTests\MathFuns\Sign.fs" />
     <Compile Include="UnitTests\MathFuns\Sin.fs" />
     <Compile Include="UnitTests\MathFuns\Sqrt.fs" />
     <Compile Include="UnitTests\MathFuns\Id.fs" />
@@ -160,6 +163,9 @@
       <Project>{5f632ce3-0988-4696-aa80-5b562232618d}</Project>
       <Name>FShark</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UnitTests\MathUtils" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
 </Project>

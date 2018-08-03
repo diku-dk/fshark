@@ -4,7 +4,7 @@ open FShark.TestTypes.TestTypes
 open System
 
 [<FSharkEntry>]
-let sqrt (a : single) (b : single) (c : double) (d : double) : (single * single * double * double) = 
+let sqrtt (a : single) (b : single) (c : double) (d : double) : (single * single * double * double) = 
     (sqrt a,sqrt b,sqrt c,sqrt d)
  
 [<FSharkInput>]

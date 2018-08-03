@@ -4,7 +4,7 @@ open FShark.TestTypes.TestTypes
 open System
 
 [<FSharkEntry>]
-let abs (fourByte : int8) (fourShort : int16) (four : int) (fourLong : int64) (fourSingle : single) (fourDouble : double) : (int8 * int16 * int * int64 * single * double) =
+let abss (fourByte : int8) (fourShort : int16) (four : int) (fourLong : int64) (fourSingle : single) (fourDouble : double) : (int8 * int16 * int * int64 * single * double) =
     (abs <| - fourByte, 
      abs <| - fourShort, 
      abs <| - four, 
