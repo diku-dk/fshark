@@ -139,6 +139,7 @@
     <Compile Include="UnitTests\Operators\Minus.fs" />
     <Compile Include="UnitTests\Operators\Mod.fs" />
     <Compile Include="UnitTests\Operators\Neq.fs" />
+    <Compile Include="UnitTests\Operators\Not.fs" />
     <Compile Include="UnitTests\Operators\Plus.fs" />
     <Compile Include="UnitTests\Operators\Range.fs" />
     <Compile Include="UnitTests\RangeTest.fs" />
