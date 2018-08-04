@@ -182,83 +182,6 @@ module FSharkPrelude =
                        ,h.[i])
         res
 
-    let rec Zip9 (a : 'a array)
-                       (b : 'b array)
-                       (c : 'c array)
-                       (d : 'd array)
-                       (e : 'e array)
-                       (f : 'f array)
-                       (g : 'g array)
-                       (h : 'h array)
-                       (i' : 'i array)
-                       : ('a* 'b* 'c* 'd* 'e* 'f* 'g* 'h* 'i) array =
-        match (a,b,c,d,e,f,g,h,i') with
-        | ([||], [||], [||], [||], [||], [||], [||], [||], [||]) -> Array.empty
-        | _ ->
-        let lenA = a.Length
-        if    lenA <> b.Length
-           && lenA <> c.Length
-           && lenA <> d.Length
-           && lenA <> e.Length
-           && lenA <> f.Length
-           && lenA <> g.Length
-           && lenA <> h.Length
-           && lenA <> i'.Length
-        then failwith "Irregular arrays"
-        else 
-        let res = Array.zeroCreate lenA
-        for i = 0 to res.Length - 1 do
-            res.[i] <- (a.[i]
-                       ,b.[i]
-                       ,c.[i]
-                       ,d.[i]
-                       ,e.[i]
-                       ,f.[i]
-                       ,g.[i]
-                       ,h.[i]
-                       ,i'.[i])
-        res
-
-    let rec Zip10 (a : 'a array)
-                        (b : 'b array)
-                        (c : 'c array)
-                        (d : 'd array)
-                        (e : 'e array)
-                        (f : 'f array)
-                        (g : 'g array)
-                        (h : 'h array)
-                        (i' : 'i array)
-                        (j : 'j array)
-                        : ('a* 'b* 'c* 'd* 'e* 'f* 'g* 'h* 'i* 'j) array =
-        match (a,b,c,d,e,f,g,h,i',j) with
-        | ([||], [||], [||], [||], [||], [||], [||], [||], [||], [||]) -> Array.empty
-        | _ ->
-        let lenA = a.Length
-        if    lenA <> b.Length
-           && lenA <> c.Length
-           && lenA <> d.Length
-           && lenA <> e.Length
-           && lenA <> f.Length
-           && lenA <> g.Length
-           && lenA <> h.Length
-           && lenA <> i'.Length
-           && lenA <> j.Length
-        then failwith "Irregular arrays"
-        else 
-        let res = Array.zeroCreate lenA
-        for i = 0 to res.Length - 1 do
-            res.[i] <- (a.[i]
-                       ,b.[i]
-                       ,c.[i]
-                       ,d.[i]
-                       ,e.[i]
-                       ,f.[i]
-                       ,g.[i]
-                       ,h.[i]
-                       ,i'.[i]
-                       ,j.[i])
-        res
-
     let  Unzip (xs : ('a * 'b) array)
         : ('a array * 'b array) =
         Array.unzip xs
@@ -362,57 +285,6 @@ module FSharkPrelude =
             res8.[i] <- h
         res1, res2, res3, res4, res5, res6, res7, res8
 
-    let  Unzip9 (xs : ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i) array)
-        : ('a array * 'b array * 'c array * 'd array * 'e array * 'f array * 'g array * 'h array * 'i array) =
-        let len = xs.Length
-        let res1 = Array.zeroCreate len
-        let res2 = Array.zeroCreate len
-        let res3 = Array.zeroCreate len
-        let res4 = Array.zeroCreate len
-        let res5 = Array.zeroCreate len
-        let res6 = Array.zeroCreate len
-        let res7 = Array.zeroCreate len
-        let res8 = Array.zeroCreate len
-        let res9 = Array.zeroCreate len
-        for i = 0 to xs.Length-1 do
-            let (a,b,c,d,e,f,g,h,i') = xs.[i]
-            res1.[i] <- a
-            res2.[i] <- b
-            res3.[i] <- c
-            res4.[i] <- d
-            res5.[i] <- e
-            res6.[i] <- f
-            res7.[i] <- g
-            res8.[i] <- h
-            res9.[i] <- i'
-        res1, res2, res3, res4, res5, res6, res7, res8, res9
-            
-    let  Unzip10 (xs : ('a * 'b * 'c * 'd * 'e * 'f * 'g * 'h * 'i * 'j) array)
-        : ('a array * 'b array * 'c array * 'd array * 'e array * 'f array * 'g array * 'h array * 'i array * 'j array) =
-        let len = xs.Length
-        let res1 = Array.zeroCreate len
-        let res2 = Array.zeroCreate len
-        let res3 = Array.zeroCreate len
-        let res4 = Array.zeroCreate len
-        let res5 = Array.zeroCreate len
-        let res6 = Array.zeroCreate len
-        let res7 = Array.zeroCreate len
-        let res8 = Array.zeroCreate len
-        let res9 = Array.zeroCreate len
-        let res10 = Array.zeroCreate len
-        for i = 0 to xs.Length-1 do
-            let (a,b,c,d,e,f,g,h,i',j) = xs.[i]
-            res1.[i] <- a
-            res2.[i] <- b
-            res3.[i] <- c
-            res4.[i] <- d
-            res5.[i] <- e
-            res6.[i] <- f
-            res7.[i] <- g
-            res8.[i] <- h
-            res9.[i] <- i'
-            res10.[i] <- j
-        res1, res2, res3, res4, res5, res6, res7, res8, res9, res10
 
     let Map f aa =
         Array.map f aa
@@ -450,16 +322,6 @@ module FSharkPrelude =
     let Map8 f aa bb cc dd ee ff gg hh =
         let curry f (a,b,c,d,e,f',g,h) = f a b c d e f' g h 
         let xs = Zip8 aa bb cc dd ee ff gg hh
-        in Array.map (curry f) xs
-
-    let Map9 f aa bb cc dd ee ff gg hh ii =
-        let curry f (a,b,c,d,e,f',g,h,i) = f a b c d e f' g h i
-        let xs = Zip9 aa bb cc dd ee ff gg hh ii
-        in Array.map (curry f) xs
-
-    let Map10 f aa bb cc dd ee ff gg hh ii jj =
-        let curry f (a,b,c,d,e,f',g,h,i,j) = f a b c d e f' g h i j
-        let xs = Zip10 aa bb cc dd ee ff gg hh ii jj
         in Array.map (curry f) xs
 
     let Reduce (op: 'a -> 'a -> 'a) (neutral : 'a) (xs : 'a array) =
