@@ -215,26 +215,7 @@ module FSharkMain =
         member this.InvokeFunction(str : string, [<ParamArray>] parameters : Object[]) =
             let parameters' = (Array.map this.PrepareFSharkInput) parameters
             let (method : MethodInfo) = this.GetCompiledFunction str
-            let watch = new Stopwatch()
-            if this.Debug then 
-                let foo = fun i ->
-                    watch.Restart()
-                    ignore <| method.Invoke(this.LibraryInstance, parameters')
-                    watch.Stop()
-                    TicksToMicroseconds watch.ElapsedTicks
-                    
-                // if OpenCL we repeat the test to ensure warm cache
-                let iterations = if this.OpenCL then 10 else 1
-                let runtime_list = List.map foo [0..iterations]
-                let sum = List.sum runtime_list
-                let average = sum / int64 runtime_list.Length
-                printfn "Average invokation time was %i ms" average
-                
-            watch.Restart()
             let result = method.Invoke(this.LibraryInstance, parameters')
-            watch.Stop()
-            if this.Debug then 
-                printfn "Invoking %s took %i ms" str (TicksToMicroseconds watch.ElapsedTicks)
             let result' = this.PrepareFSharkOutput result
             in result'
             
