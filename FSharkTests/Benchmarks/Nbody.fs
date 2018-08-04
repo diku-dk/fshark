@@ -71,26 +71,26 @@ module Main
        velocity={x=velx; y=vely; z=velz};
        acceleration={x=accx; y=accy; z=accz}}
     
-    let unwrap_body (b: body): (single * single * single * single * single * single * single * single * single * single) =
-      (b.position.x, b.position.y, b.position.z,
+    let unwrap_body (b: body): ((single * single * single) * single * (single * single * single) * (single * single * single)) =
+      ((b.position.x, b.position.y, b.position.z),
        b.mass,
-       b.velocity.x, b.velocity.y, b.velocity.z,
-       b.acceleration.x, b.acceleration.y, b.acceleration.z)
+       (b.velocity.x, b.velocity.y, b.velocity.z),
+       (b.acceleration.x, b.acceleration.y, b.acceleration.z))
     
     [<FSharkEntry>]
     let main (n_steps : int) (epsilon : single) (time_step : single) 
              (xps : single array) (yps : single array) (zps : single array) (ms : single array) 
              (xvs : single array) (yvs : single array) (zvs : single array) 
              (xas : single array) (yas : single array) (zas : single array)
-             : ((single array * single array * single array * single array) * (single array * single array * single array) * (single array * single array * single array)) =
+             : ((single * single * single) array * single array * (single * single * single) array * (single * single * single) array) =
              
       let bodies  = Map4 (fun (x,y,z) m (xv,yv,zv) (xa,ya,za) -> 
                       wrap_body x y z m xv yv zv xa ya za
                     ) (Zip3 xps yps zps) ms (Zip3 xvs yvs zvs) (Zip3 xas yas zas)
       let bodies' = advance_bodies_steps n_steps epsilon time_step bodies
       let bodies'' = Map unwrap_body (bodies')
-      let (xps,yps,zps,ms,xvs,yvs,zvs,xas,yas,zas) = Unzip10 bodies''
-      in ((xps, yps, zps, ms), (xvs, yvs, zvs), (xas, yas, zas))
+      let (poss, masss, vels, accs) = Unzip4 bodies''
+      in (poss, masss, vels, accs)
     
     let rotatePointByMatrix (rotation: single array array) (p: position): position =
       let x = p.x
