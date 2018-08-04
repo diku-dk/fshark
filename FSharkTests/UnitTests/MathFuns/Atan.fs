@@ -11,7 +11,7 @@ let atann (x : single) (y : double) : (single * single * double * double) =
      atan <| - y)
 
 [<FSharkInput>]
-let value = [|0.5f; -0.5|] : obj array
+let value = [|0.5f; 0.5|] : obj array
 
 [<FSharkOutput>]
 let sameValue = (0.46364f,-0.46364f ,0.46364,-0.46364) : (single * single * double * double)

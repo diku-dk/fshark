@@ -11,5 +11,3 @@ let value = [|100|] : obj array
 [<FSharkOutput>]
 let outvalue = 4950 : int
 
-[<FSharkConvertion>]
-let conv (x : obj) = downcast x : int

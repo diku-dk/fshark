@@ -11,7 +11,7 @@ let asinn (x : single) (y : double) : (single * single * double * double) =
      asin <| - y)
 
 [<FSharkInput>]
-let value = [|0.5f; -0.5|] : obj array
+let value = [|0.5f; 0.5|] : obj array
 
 [<FSharkOutput>]
 let sameValue = (0.52359f,-0.52359f,0.52359,-0.52359) : (single * single * double * double)

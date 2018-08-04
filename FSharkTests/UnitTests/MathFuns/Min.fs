@@ -14,7 +14,7 @@ let minn
     
 
 [<FSharkInput>]
-let value = [|4uy; 128uy; 31; 32; (-infinity); 4.0|] : obj array
+let value = [|4uy; 127uy; 31; 32; (-infinity); 4.0|] : obj array
 
 [<FSharkOutput>]
-let sameValue = (4uy, 31, -infinity) : (uint8 * int * double)
+let sameValue = (4uy, 31, (0.0-infinity)) : (uint8 * int * double)

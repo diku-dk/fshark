@@ -11,5 +11,3 @@ let value = [|[|1;2;3|]|] : obj array
 [<FSharkOutput>]
 let outvalue = 6 : int
 
-[<FSharkConvertion>]
-let conv (x : obj) = downcast x : int

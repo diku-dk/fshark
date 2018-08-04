@@ -12,5 +12,3 @@ let value = [|0|] : obj array
 [<FSharkOutput>]
 let sameValue = (1, 2) : (int * int)
 
-[<FSharkConvertion>]
-let conv (x : obj) = downcast x : int

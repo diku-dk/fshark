@@ -7,7 +7,7 @@ open System
 let atann2 (x1 : single) (x2 : single) (y1 : double) (y2 : double) : (single * single * double * double) =
     (atan2 x1 x2,
      atan2 (-x1) (-x2), 
-     atan2 (-y1) (-y2), 
+     atan2 (y1) (y2), 
      atan2 (-y1) (-y2))
 
 [<FSharkInput>]

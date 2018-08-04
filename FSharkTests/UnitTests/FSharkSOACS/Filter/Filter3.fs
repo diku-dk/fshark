@@ -18,5 +18,3 @@ let value = [|[|0;1;-2;5;42|];[|false;true;true;false;true|]|] : obj array
 let outvalue = ([|true;true;true|] , [|1;-2;42|]) : (bool [] * int [])
 // fails until PrepareFSharkOutput works recursively on tuples
 
-[<FSharkConvertion>]
-let conv (x : obj) = downcast x : int

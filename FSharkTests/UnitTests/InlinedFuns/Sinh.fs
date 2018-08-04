@@ -5,10 +5,10 @@ open System
 
 [<FSharkEntry>]
 let sinn (x : single) (y : double) : (single * single * double * double) =
-    (sin x, 
-     sin <| - x, 
-     sin y, 
-     sin <| - y)
+    (sinh x, 
+     sinh <| - x, 
+     sinh y, 
+     sinh <| - y)
 
 [<FSharkInput>]
 let value = [|1.0f; 1.0|] : obj array

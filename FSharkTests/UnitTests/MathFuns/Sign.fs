@@ -16,4 +16,4 @@ let signn (fourByte : int8) (fourShort : int16) (zero : int) (fourLong : int64) 
 let value = [|4y; 4s; 0; 4L; 4.0f; 4.0|] : obj array
 
 [<FSharkOutput>]
-let sameValue = (1,-1,0,-1,1,1) : (int * int * int * int * int * int)
+let sameValue = (1,-1,0,-1,1,-1) : (int * int * int * int * int * int)

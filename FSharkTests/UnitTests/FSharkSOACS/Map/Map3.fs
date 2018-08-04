@@ -30,6 +30,4 @@ let outvalue =  [|
                         [|11;12;13|]
                     |]
                 |] : obj array
-            
-[<FSharkConvertion>]
-let conv (x : obj) = downcast x : int
+
