@@ -206,7 +206,6 @@ let main (outer_loop_count: int) (numX: int) ( numY: int) ( numT: int)
   in res
 
 
- (*
 // small.in
 [<FSharkInput>]
 let valIn = [|16;32;256;256;0.03f;5.0f;0.2f;0.6f;0.5f|] : obj []
@@ -218,8 +217,8 @@ let valOut =
    |] : single []
  
 
-*)
 
+ (*
 // medium.in
 [<FSharkInput>]
 let valIn = [|128;256;32;64;0.03f;5.0f;0.2f;0.6f;0.5f|] : obj []
@@ -244,6 +243,7 @@ let valOut =
       0.0075706f;  0.00749704f; 0.00742412f; 0.00735183f; 0.00728016f; 0.00720909f; 0.00713861f; 0.00706872f
     |] : single []
 
+*)
 
 (*
 

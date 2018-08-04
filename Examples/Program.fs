@@ -81,7 +81,8 @@ let main argv =
                 preludePath="/home/mikkel/Documents/fshark/FSharkPrelude/bin/Debug/FSharkPrelude.dll",
                 openCL=true,
                 unsafe=true,
-                debug=true
+                debug=true,
+                LibraryArgs=[|"-t:benchmarkresults"|]
                 )
                 
         wrapper.AddSourceFile "../../srcs/nbody.fs"

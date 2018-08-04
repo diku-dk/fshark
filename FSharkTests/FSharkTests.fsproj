@@ -98,12 +98,8 @@
     <Compile Include="UnitTests\FSharkSOACS\ZipUnzip\Zip7b.fs" />
     <Compile Include="UnitTests\FSharkSOACS\ZipUnzip\Zip8a.fs" />
     <Compile Include="UnitTests\FSharkSOACS\ZipUnzip\Zip8b.fs" />
-    <Compile Include="UnitTests\FSharkSOACS\ZipUnzip\Zip9a.fs" />
-    <Compile Include="UnitTests\FSharkSOACS\ZipUnzip\Zip9b.fs" />
     <Compile Include="UnitTests\FSharkSOACS\ZipUnzip\Zipa.fs" />
     <Compile Include="UnitTests\FSharkSOACS\ZipUnzip\Zipb.fs" />
-    <Compile Include="UnitTests\FSharkSOACS\ZipUnzip\Zip10a.fs" />
-    <Compile Include="UnitTests\FSharkSOACS\ZipUnzip\Zip10b.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Map\Map1.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Map\Map1Single.fs" />
     <Compile Include="UnitTests\FSharkSOACS\Map\Map2.fs" />
@@ -142,12 +138,10 @@
     <Compile Include="UnitTests\Operators\Not.fs" />
     <Compile Include="UnitTests\Operators\Plus.fs" />
     <Compile Include="UnitTests\Operators\Range.fs" />
-    <Compile Include="UnitTests\RangeTest.fs" />
     <Compile Include="UnitTests\Rounding\Ceil.fs" />
     <Compile Include="UnitTests\Rounding\Floor.fs" />
     <Compile Include="UnitTests\Rounding\Round.fs" />
     <Compile Include="UnitTests\Rounding\Trunc.fs" />
-    <Compile Include="UnitTests\SequenceTest.fs" />
     <Compile Include="UnitTests\Tuple1.fs" />
     <Compile Include="UnitTests\TupleNaming.fs" />
     <Compile Include="AssemblyInfo.fs" />
@@ -164,9 +158,6 @@
       <Project>{5f632ce3-0988-4696-aa80-5b562232618d}</Project>
       <Name>FShark</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UnitTests\MathUtils" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
 </Project>

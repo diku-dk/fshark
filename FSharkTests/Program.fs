@@ -2,6 +2,7 @@
 open FShark.Library
 open FShark.Main
 open FSharkTest.TestBase
+open System.Diagnostics
 
 type ToTest = SingleTest of string
             | FolderTest of string
@@ -30,6 +31,7 @@ let main argv =
          true,
          true,
          true
+         //, LibraryArgs=[|"-t=resultslargeinnoncel"; "-r=10"|]
         )
     let tester = new Tester(PreludeDLL, TestDLL, fshark, true)
     match Array.head argv with 

@@ -5,6 +5,7 @@ open System.Reflection
 open System
 open System.Diagnostics
 open Microsoft.FSharp.Compiler.SourceCodeServices
+open FSharp.Reflection
 
     
 module TestBase =
@@ -13,6 +14,7 @@ module TestBase =
     open FShark.Library
     open FShark
     open FShark.Main.FSharkMain
+    open System
 
     type TestDict = {inputName: string
                     ;outputName: string
@@ -38,6 +40,8 @@ module TestBase =
         val mutable FSharkLib : string
         val mutable fsharkMain : FSharkMain
         val mutable benchmark : bool
+        val mutable comparisons : int
+        
         abstract member RunFolderOfTests : string -> unit
         abstract member RunSingleTest : string -> unit
         
@@ -48,10 +52,41 @@ module TestBase =
             ; PreludeLib=preludePath
             ; fsharkMain=fshark
             ; benchmark=benchmark
+            ; comparisons=0
             }
             
             
-                        
+        member this.epsilonf = 0.01f
+        member this.epsilon = 0.01
+        
+        member this.compareElement (x : obj) (y : obj) : bool =
+            this.comparisons <- this.comparisons + 1
+            match x with
+            | :? single as x' -> 
+                let y' = unbox<single> y
+                in (abs (x' - y') < this.epsilonf || x'.Equals(y'))
+            | :? double as x' -> 
+                let y' = unbox<double> y
+                in (abs (x' - y') < this.epsilon || x'.Equals(y'))
+            | _ -> x = y
+            
+        member this.compareResults (x : 'a) (y : 'a) : bool =
+            let objToObjArray (o : obj) =
+                let objArray = o :?> System.Array
+                let objSeq = Seq.cast<obj> objArray
+                in Seq.toArray objSeq 
+                
+            let tp = x.GetType()
+            if FSharpType.IsTuple tp
+            then let xs = FSharpValue.GetTupleFields x
+                 let ys = FSharpValue.GetTupleFields y
+                 in Array.fold (fun acc (x',y') -> acc && this.compareResults x' y') true (Array.zip xs ys)
+            else if tp.IsArray
+            then let xs = objToObjArray x
+                 let ys = objToObjArray y
+                 in Array.fold (fun acc (x',y') -> acc && this.compareResults x' y') true (Array.zip xs ys)
+            else this.compareElement x y
+             
         member this.getElemWithAttribute (elems : FSharpImplementationFileDeclaration list) 
                                          (attrName : string) (testname : string) : (string * FSharpImplementationFileDeclaration) =
             let maybeElem maybe elem =
@@ -142,8 +177,8 @@ module TestBase =
             stopWatch2.Stop()
             printfn "Native took %d microseconds." <| FShark.Library.Utils.TicksToMicroseconds stopWatch2.ElapsedTicks
             let testOK = 
-                fsharkTestResult' = nativeTestResult &&
-                testOutput = nativeTestResult
+                this.compareResults fsharkTestResult' nativeTestResult &&
+                this.compareResults testOutput nativeTestResult
             
             in testOK
         

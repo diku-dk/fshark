@@ -26,6 +26,7 @@ module FSharkCompiler =
              match tp' with
              | "Int" -> Prim <| Int FInt32
              | "Int8" -> Prim <| Int FInt8
+             | "Byte" -> Prim <| UInt FUInt8
              | "SByte" -> Prim <| Int FInt8
              | "Int16" -> Prim <| Int FInt16
              | "Int32" -> Prim <| Int FInt32
@@ -347,7 +348,7 @@ module FSharkCompiler =
             
             | "Max" -> Some <| GetTypedCall tps "max" args'
             | "Min" -> Some <| GetTypedCall tps "min" args'
-            | "Sign" -> Some <| GetTypedCall tps "to_i32" [GetTypedCall tps "sgn" args']
+            | "Sign" -> Some <| GetCall "i32.i64" [GetTypedCall tps "to_i64" [GetTypedCall tps "sgn" args']]
             | "Not" -> Some <| GetCall "!" args'
             | "PowInteger" -> Some <| PowInteger args' tps
             | "Raise" -> Some <| GetCall "OOPS" []
@@ -364,18 +365,16 @@ module FSharkCompiler =
         
     and Sinh args tps : FSharkCode =
         let ex = GetTypedCall tps "exp" [List.head args]
-        let enegx = GetTypedCall tps "exp" [FSharkCode.UnaryOp(UnarySub, Some <| getFtype tps, List.head args)]
+        let enegx = GetTypedCall tps "exp" [FSharkCode.UnaryOp(UnaryNeg, Some <| getFtype tps, List.head args)]
                                          
         let explusenegx = FSharkCode.InfixOp(Sub, Some <| getFtype tps, ex, enegx)
         in FSharkCode.InfixOp(Div, Some <| getFtype tps, explusenegx, FSharkCode.Const((upcast 2 : obj), getFtype tps))
         
     and Cosh args tps  : FSharkCode =
-        let ex = FSharkCode.InfixOp(Pow, Some <| getFtype tps,
-                                         GetTypedCall tps "e" [],
-                                         List.head args)
-        let enegx = FSharkCode.InfixOp(Pow, Some <| getFtype tps,
-                                         GetTypedCall tps "e" [],
-                                         FSharkCode.UnaryOp(UnarySub, Some <| getFtype tps, List.head args))
+        let ex = GetTypedCall tps "exp" [List.head args]
+        let enegx = 
+            GetTypedCall tps "exp" [FSharkCode.UnaryOp(UnaryNeg, Some <| getFtype tps, List.head args)]
+        
         let explusenegx = FSharkCode.InfixOp(Add, Some <| getFtype tps, ex, enegx)
         in FSharkCode.InfixOp(Div, Some <| getFtype tps, explusenegx, FSharkCode.Const((upcast 2 : obj), getFtype tps))
     
@@ -390,10 +389,10 @@ module FSharkCompiler =
         in FSharkCode.InfixOp(Div, Some <| (CompileFSharkType << List.head) tps, top, bottom)
         
     and Compare args tps : FSharkCode =
-        let elseBranch = FSharkCode.If(FSharkCode.InfixOp(Greater, Some <| getFtype tps, args.[0], args.[1]), 
+        let elseBranch = FSharkCode.If(FSharkCode.InfixOp(Less, Some <| getFtype tps, args.[0], args.[1]), 
                                            FSharkCode.Const((upcast -1 : obj), Prim <| FSharkPrim.Int FInt32),
                                            FSharkCode.Const((upcast 0 : obj), Prim <| FSharkPrim.Int FInt32))
-        in FSharkCode.If(FSharkCode.InfixOp(Less, Some <| getFtype tps, args.[0], args.[1]), 
+        in FSharkCode.If(FSharkCode.InfixOp(Greater, Some <| getFtype tps, args.[0], args.[1]), 
                          FSharkCode.Const((upcast 1 : obj), Prim <| FSharkPrim.Int FInt32),
                          elseBranch)
                              
