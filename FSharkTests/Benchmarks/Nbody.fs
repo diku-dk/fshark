@@ -84,9 +84,9 @@ module Main
              (xas : single array) (yas : single array) (zas : single array)
              : ((single array * single array * single array * single array) * (single array * single array * single array) * (single array * single array * single array)) =
              
-      let bodies  = Map (fun (x,y,z,m,xv,yv,zv,xa,ya,za) -> 
+      let bodies  = Map4 (fun (x,y,z) m (xv,yv,zv) (xa,ya,za) -> 
                       wrap_body x y z m xv yv zv xa ya za
-                    ) <| Zip10 xps yps zps ms xvs yvs zvs xas yas zas
+                    ) (Zip3 xps yps zps) ms (Zip3 xvs yvs zvs) (Zip3 xas yas zas)
       let bodies' = advance_bodies_steps n_steps epsilon time_step bodies
       let bodies'' = Map unwrap_body (bodies')
       let (xps,yps,zps,ms,xvs,yvs,zvs,xas,yas,zas) = Unzip10 bodies''

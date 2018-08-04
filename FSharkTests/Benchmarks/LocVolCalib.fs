@@ -3,7 +3,7 @@ open FSharkPrelude.FSharkPrelude
 open FShark.TestTypes.TestTypes
 
 let initGrid (s0: float32) (alpha: float32) (nu: float32) (t: float32) (numX: int) (numY: int) (numT: int)
-  : (int * int * float32 array * float32 array * float32 array) =
+  : (int * int * float32 [] * float32 [] * float32 []) =
   let logAlpha = log alpha
   let myTimeline = Map (fun i -> (t * (float32 i)) / ((float32 numT) - 1.0f)) (Iota numT)
   let (stdX, stdY) = (20.0f * alpha * s0 * sqrt(t),
@@ -15,7 +15,7 @@ let initGrid (s0: float32) (alpha: float32) (nu: float32) (t: float32) (numX: in
   in (myXindex, myYindex, myX, myY, myTimeline)
 
 // make the innermost dimension of the result of size 4 instead of 3?
-let initOperator (x: float32 array) : (float32 array array * float32 array array) = 
+let initOperator (x: float32 []) : (float32 [] [] * float32 [] []) = 
   let n = Length x
   let dxu     = x.[1] - x.[0]
   let dx_low  = [|[|0.0f; -1.0f / dxu; 1.0f / dxu|]|]
@@ -29,19 +29,19 @@ let initOperator (x: float32 array) : (float32 array array * float32 array array
                     
   let (dx_mid, dxx_mid) = Unzip dx_mids
   let dxl      = x.[n-1] - x.[n-2]
-  let dx_high  = [|[|-1.0f / dxl; 1.0f / dxl; 0.0f |]|] : float32 array array
-  let dxx_high = [|[|0.0f; 0.0f; 0.0f |]|] : float32 array array
+  let dx_high  = [|[|-1.0f / dxl; 1.0f / dxl; 0.0f |]|] : float32 [] []
+  let dxx_high = [|[|0.0f; 0.0f; 0.0f |]|] : float32 [] []
   let dx     = Concat dx_low <| Concat dx_mid dx_high
   let dxx    = Concat dxx_low <| Concat dxx_mid dxx_high
   in  (dx, dxx)
 
-let setPayoff (strike: float32) (myX: float32 array) (_myY: float32 array) : float32 array array =
+let setPayoff (strike: float32) (myX: float32 []) (_myY: float32 []) : float32 [] [] =
   let numY = Length _myY
   Replicate numY (Map (fun xi -> max (xi-strike) 0.0f) myX)
 
 // Returns new myMuX, myVarX, myMuY, myVarY.
-let updateParams (myX: float32 array) (myY : float32 array) (tnow: float32) (_alpha: float32) (beta: float32) (nu: float32)
-  : (float32 array array * float32 array array * float32 array array * float32 array array) =
+let updateParams (myX: float32 []) (myY : float32 []) (tnow: float32) (_alpha: float32) (beta: float32) (nu: float32)
+  : (float32 [] [] * float32 [] [] * float32 [] [] * float32 [] []) =
   let numX = Length myX
   let numY = Length myY
   let myMuY  = Replicate numX (Replicate numY 0.0f)
@@ -53,7 +53,7 @@ let updateParams (myX: float32 array) (myY : float32 array) (tnow: float32) (_al
                    myY
   in  ( myMuX, myVarX, myMuY, myVarY )
 
-let tridagPar (a: float32 array) (b: float32 array) (c : float32 array) (y : float32 array) : float32 array =
+let tridagPar (a: float32 []) (b: float32 []) (c : float32 []) (y : float32 []) : float32 [] =
 
   let n = Length a
 (*----------------------------------------------------
@@ -119,14 +119,14 @@ let tridagPar (a: float32 array) (b: float32 array) (c : float32 array) (y : flo
   let y    = Map (fun i -> y.[n-i-1]) (Iota n)
   in y
 
-let explicitMethod (myD:    float32 array array) (myDD: float32 array array)
-                   (myMu:   float32 array array) (myVar: float32 array array)
-                   (result: float32 array array)
-                  : float32 array array =
+let explicitMethod (myD:    float32 [] []) (myDD: float32 [] [])
+                   (myMu:   float32 [] []) (myVar: float32 [] [])
+                   (result: float32 [] [])
+                  : float32 [] [] =
   // 0 <= i < m AND 0 <= j < n
   let m = Length myDD
-  Map3 (fun (mu_row : float32 array) (var_row : float32 array) (result_row : float32 array) ->
-         Map5 (fun (dx : float32 array) (dxx : float32 array) (mu : float32) (var : float32) (j : int) ->
+  Map3 (fun (mu_row : float32 []) (var_row : float32 []) (result_row : float32 []) ->
+         Map5 (fun (dx : float32 []) (dxx : float32 []) (mu : float32) (var : float32) (j : int) ->
                 let c1 = if 0 < j
                          then (mu*dx.[0] + 0.5f*var*dxx.[0]) * result_row.[j-1]
                          else 0.0f
@@ -139,24 +139,25 @@ let explicitMethod (myD:    float32 array array) (myDD: float32 array array)
       myMu myVar result
 
 // for implicitY: should be called with transpose(u) instead of u
-let implicitMethod (myD:  float32 array array)  (myDD:  float32 array array)
-                   (myMu: float32 array array)  (myVar: float32 array array)
-                   (u:    float32 array array)  (dtInv: float32)
-                    : float32 array array =
-  Map3 (fun (mu_row : float32 array) (var_row : float32 array) (u_row : float32 array) ->
+let implicitMethod (myD:  float32 [] [])  (myDD:  float32 [] [])
+                   (myMu: float32 [] [])  (myVar: float32 [] [])
+                   (u:    float32 [] [])  (dtInv: float32)
+                    : float32 [] [] =
+  Map3 (fun (mu_row : float32 []) (var_row : float32 []) (u_row : float32 []) ->
           let (a,b,c) = Unzip3 (
-                          Map4 (fun (mu : float32) (var : float32) (d : float32 array) (dd : float32 array) ->
-                                  (0.0f - 0.5f*(mu*d.[0] + 0.5f*var*dd.[0]), dtInv - 0.5f*(mu*d.[1] + 0.5f*var*dd.[1]), 0.0f   - 0.5f*(mu*d.[2] + 0.5f*var*dd.[2])
+                          Map4 (fun (mu : float32) (var : float32) (d : float32 []) (dd : float32 []) ->
+                                  (0.0f - 0.5f*(mu*d.[0] + 0.5f*var*dd.[0]), dtInv - 0.5f*(mu*d.[1] + 0.5f*var*dd.[1]), 
+                                   0.0f   - 0.5f*(mu*d.[2] + 0.5f*var*dd.[2])
                                   )
                                ) mu_row var_row myD myDD
                               )
           in tridagPar a b c u_row
        ) myMu myVar u
 
-let rollback (tnow: float32) (tnext: float32) (myResult: float32 array array)
-   (myMuX: float32 array array) (myDx: float32 array array) (myDxx: float32 array array) (myVarX : float32 array array)
-   (myMuY: float32 array array) (myDy: float32 array array) (myDyy: float32 array array) (myVarY: float32 array array)
-  : float32 array array =
+let rollback (tnow: float32) (tnext: float32) (myResult: float32 [] [])
+   (myMuX: float32 [] []) (myDx: float32 [] []) (myDxx: float32 [] []) (myVarX : float32 [] [])
+   (myMuY: float32 [] []) (myDy: float32 [] []) (myDyy: float32 [] []) (myVarY: float32 [] [])
+  : float32 [] [] =
 
   let dtInv = 1.0f/(tnext-tnow)
 
@@ -205,24 +206,23 @@ let main (outer_loop_count: int) (numX: int) ( numY: int) ( numT: int)
   in res
 
 
-
-  
-(*
+ (*
 // small.in
 [<FSharkInput>]
-let valIn = [|16;32;256;256;0.03f;5.0f;0.2f;0.6f;0.5f|] : obj array
+let valIn = [|16;32;256;256;0.03f;5.0f;0.2f;0.6f;0.5f|] : obj []
 
 [<FSharkOutput>]
 let valOut = 
    [| 0.0300001f;  0.0290001f;  0.0280001f;  0.0270001f;  0.026f;      0.0251064f;  0.0247889f;  0.0244714f; 
       0.0241539f;  0.0238364f;  0.0235189f;  0.0232014f;  0.0228839f;  0.0225664f;  0.0222744f;  0.02199f
-   |] : single array
+   |] : single []
+ 
+
 *)
-   
-(*
+
 // medium.in
 [<FSharkInput>]
-let valIn = [|128;256;32;64;0.03f;5.0f;0.2f;0.6f;0.5f|] : obj array
+let valIn = [|128;256;32;64;0.03f;5.0f;0.2f;0.6f;0.5f|] : obj []
 
 [<FSharkOutput>]
 let valOut = 
@@ -242,12 +242,14 @@ let valOut =
       0.00884636f; 0.00876059f; 0.00867569f; 0.00859167f; 0.00850848f; 0.00842613f; 0.00834459f; 0.00826384f; 
       0.00818388f; 0.00810468f; 0.00802623f; 0.00794852f; 0.00787153f; 0.00779524f; 0.00771969f; 0.00764481f;
       0.0075706f;  0.00749704f; 0.00742412f; 0.00735183f; 0.00728016f; 0.00720909f; 0.00713861f; 0.00706872f
-    |] : single array
-*)
+    |] : single []
+
+
+(*
 
 // large.in
 [<FSharkInput>]
-let valIn = [|256;256;256;64;0.03f;5.0f;0.2f;0.6f;0.5f|] : obj array
+let valIn = [|256;256;256;64;0.03f;5.0f;0.2f;0.6f;0.5f|] : obj []
 
 [<FSharkOutput>]
 let valOut = 
@@ -287,4 +289,6 @@ let valOut =
     0.001616f; 0.001571f; 0.001527f; 0.001482f; 0.001438f; 0.001394f; 0.001350f;
     0.001306f; 0.001262f; 0.001218f; 0.001174f; 0.001130f; 0.001086f; 0.001042f;
     0.000998f; 0.000954f; 0.000911f; 0.000867f; 0.000823f; 0.000780f; 0.000736f;
-    0.000692f; 0.000649f; 0.000605f; 0.000562f|] : single array
+    0.000692f; 0.000649f; 0.000605f; 0.000562f|] : single []
+    
+    *)
