@@ -41,6 +41,7 @@ module TestBase =
         val mutable fsharkMain : FSharkMain
         val mutable benchmark : bool
         val mutable comparisons : int
+        val mutable testCases : int
         
         abstract member RunFolderOfTests : string -> unit
         abstract member RunSingleTest : string -> unit
@@ -53,6 +54,7 @@ module TestBase =
             ; fsharkMain=fshark
             ; benchmark=benchmark
             ; comparisons=0
+            ; testCases=0
             }
             
             
@@ -157,7 +159,7 @@ module TestBase =
             let testInput  = (testModule.GetProperty testDict.inputName).GetValue(0) :?> obj array
             let testOutput = (testModule.GetProperty testDict.outputName).GetValue(0)
             let testFun  = testModule.GetMethod testDict.entryName
-            
+            this.testCases <- this.testCases + Array.length testInput
             this.fsharkMain.LibraryName <- "tmp_"+testModule.Name
             this.fsharkMain.CompileAndLoadFSharpModule testEntity filepath
             let stopWatch = System.Diagnostics.Stopwatch.StartNew()
@@ -204,6 +206,7 @@ module TestBase =
                     acc
                     
             ignore <| List.fold foldLoop 0 tests'
+            printfn "%d tests with in total %d test cases was run" num_tests this.testCases
         
         // this is an entry function
         default this.RunSingleTest (filepath : string) : unit =

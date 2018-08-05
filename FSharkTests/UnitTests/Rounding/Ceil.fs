@@ -14,4 +14,4 @@ let ceill (x : single) (y : double) : (single * single * double * double) =
 let value = [|3.14159f; 3.14159|] : obj array
 
 [<FSharkOutput>]
-let sameValue = (4.0f, -2.0f, 4.0, -2.0) : (single * single * double * double)
+let sameValue = (4.0f, -3.0f, 4.0, -3.0) : (single * single * double * double)

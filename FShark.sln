@@ -10,6 +10,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharkPreludeTests", "FShar
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Examples", "Examples\Examples.fsproj", "{6F54AC97-38E7-4BC6-B337-176FE110AC20}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpTest", "CSharpTest\CSharpTest.csproj", "{0662CEF0-FB80-4985-B65D-C5C2B2069584}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{6F54AC97-38E7-4BC6-B337-176FE110AC20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F54AC97-38E7-4BC6-B337-176FE110AC20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F54AC97-38E7-4BC6-B337-176FE110AC20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0662CEF0-FB80-4985-B65D-C5C2B2069584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0662CEF0-FB80-4985-B65D-C5C2B2069584}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0662CEF0-FB80-4985-B65D-C5C2B2069584}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0662CEF0-FB80-4985-B65D-C5C2B2069584}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

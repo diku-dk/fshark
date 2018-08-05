@@ -28,7 +28,7 @@ let main argv =
         "Internal",
         "/home/mikkel/FShark",
         "/home/mikkel/Documents/fshark/FSharkPrelude/bin/Debug/FSharkPrelude.dll",
-         true,
+         false,
          true,
          true
          //, LibraryArgs=[|"-t=resultslargeinnoncel"; "-r=10"|]
