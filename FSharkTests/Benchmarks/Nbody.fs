@@ -42,7 +42,7 @@ module Main
       let s = y.mass * invr3
       in Vec3.scale s r
     
-    let calc_accels (epsilon: single) (bodies: body array): acceleration array =
+    let calc_accels (epsilon: single) (bodies: body []): acceleration [] =
       let move (body: body) =
         let accels = Map (accel epsilon body) bodies
         in Reduce_Comm (Vec3.plus) {x=0.0f; y=0.0f; z=0.0f} accels
@@ -54,12 +54,12 @@ module Main
       let velocity = Vec3.plus body.velocity <| Vec3.scale time_step acceleration
       in {position=position; mass=body.mass; velocity=velocity; acceleration=acceleration}
     
-    let advance_bodies (epsilon: single) (time_step: single) (bodies: body array): body array =
+    let advance_bodies (epsilon: single) (time_step: single) (bodies: body []): body [] =
       let accels = calc_accels epsilon bodies
       in Map2 (fun body acc -> advance_body time_step body acc) bodies accels
     
     let advance_bodies_steps (n_steps: int) (epsilon: single) (time_step: single)
-                                 (bodies: body array): body array =
+                                 (bodies: body []): body [] =
       let steps = Iota n_steps
       in Foldr (fun _ bodies' -> advance_bodies epsilon time_step bodies') bodies steps
     
@@ -79,10 +79,10 @@ module Main
     
     [<FSharkEntry>]
     let main (n_steps : int) (epsilon : single) (time_step : single) 
-             (xps : single array) (yps : single array) (zps : single array) (ms : single array) 
-             (xvs : single array) (yvs : single array) (zvs : single array) 
-             (xas : single array) (yas : single array) (zas : single array)
-             : ((single * single * single) array * single array * (single * single * single) array * (single * single * single) array) =
+             (xps : single []) (yps : single []) (zps : single []) (ms : single []) 
+             (xvs : single []) (yvs : single []) (zvs : single []) 
+             (xas : single []) (yas : single []) (zas : single [])
+             : ((single [] * single [] * single []) * single [] * (single [] * single [] * single []) * (single [] * single [] * single [])) =
              
       let bodies  = Map4 (fun (x,y,z) m (xv,yv,zv) (xa,ya,za) -> 
                       wrap_body x y z m xv yv zv xa ya za
@@ -90,9 +90,9 @@ module Main
       let bodies' = advance_bodies_steps n_steps epsilon time_step bodies
       let bodies'' = Map unwrap_body (bodies')
       let (poss, masss, vels, accs) = Unzip4 bodies''
-      in (poss, masss, vels, accs)
+      in (Unzip3 poss, masss, Unzip3 vels, Unzip3 accs)
     
-    let rotatePointByMatrix (rotation: single array array) (p: position): position =
+    let rotatePointByMatrix (rotation: single [] []) (p: position): position =
       let x = p.x
       let y = p.y
       let z = p.z
@@ -100,40 +100,40 @@ module Main
        y= x*rotation.[0].[1] + y*rotation.[1].[1] + z*rotation.[2].[1];
        z= x*rotation.[0].[2] + y*rotation.[1].[2] + z*rotation.[2].[2]}
     
-    let rotatePointsByMatrix (rotation: single array array) (ps: position array): position array =
+    let rotatePointsByMatrix (rotation: single [] []) (ps: position []): position [] =
       Map (rotatePointByMatrix rotation) ps
     
-    let rotateXMatrix (angle: single): single array array =
+    let rotateXMatrix (angle: single): single [] [] =
       [|
         [|1.0f;       0.0f;          0.0f|];
         [|0.0f;  cos angle;   - sin angle|];
         [|0.0f;  sin angle;     cos angle|]
       |]
     
-    let rotateYMatrix (angle: single): single array array =
+    let rotateYMatrix (angle: single): single [] [] =
       [|
         [|cos angle  ; 0.0f; sin angle|];
         [|0.0f       ; 1.0f; 0.0f     |];
         [|- sin angle; 0.0f; cos angle|]
       |]
     
-    let matmult (x: single array array) (y: single array array) : single array array =
+    let matmult (x: single [] []) (y: single [] []) : single [] [] =
       let Sum = Reduce (+) 0.0f
       Map (fun xr ->
             Map (fun yc -> Sum (Map2 (fun x y -> x*y) xr yc)) (Transpose y)
                 ) x
     
-    let rotationMatrix (x_rotation: single) (y_rotation: single): single array array =
+    let rotationMatrix (x_rotation: single) (y_rotation: single): single [] [] =
       matmult (rotateXMatrix x_rotation) (rotateYMatrix y_rotation)
     
-    let inverseRotationMatrix (x_rotation: single) (y_rotation: single): single array array =
+    let inverseRotationMatrix (x_rotation: single) (y_rotation: single): single [] [] =
       matmult (rotateYMatrix y_rotation) (rotateXMatrix x_rotation)
     
     let inverseRotatePoint (x : single) (y : single) (z : single) (x_rotation : single) (y_rotation : single) : (single*single*single) =
       let vec = rotatePointByMatrix (inverseRotationMatrix x_rotation y_rotation) {x=x;y=y;z=z}
       in (vec.x,vec.z, vec.y)
     
-    let rotatePoints (ps: position array) (x_rotation: single) (y_rotation: single): position array =
+    let rotatePoints (ps: position []) (x_rotation: single) (y_rotation: single): position [] =
       rotatePointsByMatrix (rotationMatrix x_rotation y_rotation) ps
     
     (*
@@ -177,8 +177,8 @@ module Main
     let outputData = (
         ([|60.402256f, -11.430504f, 5.672099f, -46.79211f, 32.574455f, 67.3728f, -10.644274f, -1.9366095f, -37.81175f, 28.138607f, 26.732052f, -8.415286f, 6.675616f, -42.53744f, 31.007177f, 64.01576f, -1.29756f, 2.984476f, -48.420025f, 24.05571f, 38.412075f, -11.713844f, 0.29591668f, -39.304882f, 29.410185f, 79.16618f, -1.3194776f, 8.919601f, -49.27589f, 42.495594f, 58.644115f, -22.410553f|],
         [|37.99447f, 27.125307f, 70.57071f, -12.007825f, -23.946268f, 34.43472f, 25.257013f, 70.68937f, 2.0563722f, -39.52876f, 10.697684f, 37.529408f, 55.826862f, -10.963094f, -26.778881f, 73.82858f, 27.675724f, 67.32786f, -18.939562f, -26.526985f, 21.907555f, 25.808075f, 53.392735f, -2.4880366f, -30.127684f, 21.078148f, 14.902553f, 70.99377f, -9.043354f, -53.756332f, 37.20186f, 10.888989f|],
-        [|60.14521f, 28.753597f, -77.842896f, -30.323624f, 29.79417f, 59.36437f, 26.39887f, -83.21151f, -20.14278f, 70.849945f, 58.990242f, 25.032337f, -82.31381f, -35.619644f, 41.412075f, 98.300285f, 45.853508f, -79.47979f, -30.91017f, 55.817623f, 58.91943f, 34.806118f, -59.070557f, -35.646812f, 50.689945f, 52.9975f, 21.06105f, -71.09529f, -8.953376f, 36.63188f, 58.620056f, 24.760492f|],
-        [|3.456227f, 63.459526f, 74.34554f, 8.434827f, 16.776989f, 21.63172f, 69.831604f, 66.98223f, 23.477612f, 4.5274367f, 45.534313f, 37.293446f, 52.771004f, 83.92678f, 13.032608f, 18.12446f, 53.132633f, 94.62536f, 6.5728045f, 53.180336f, 91.3407f, 87.52959f, 75.542244f, 35.689384f, 77.35545f, 34.4798f, 20.805649f, 58.3743f, 20.659788f, 82.26547f, 86.262726f, 52.37195f|]),
+        [|60.14521f, 28.753597f, -77.842896f, -30.323624f, 29.79417f, 59.36437f, 26.39887f, -83.21151f, -20.14278f, 70.849945f, 58.990242f, 25.032337f, -82.31381f, -35.619644f, 41.412075f, 98.300285f, 45.853508f, -79.47979f, -30.91017f, 55.817623f, 58.91943f, 34.806118f, -59.070557f, -35.646812f, 50.689945f, 52.9975f, 21.06105f, -71.09529f, -8.953376f, 36.63188f, 58.620056f, 24.760492f|]),
+        [|3.456227f, 63.459526f, 74.34554f, 8.434827f, 16.776989f, 21.63172f, 69.831604f, 66.98223f, 23.477612f, 4.5274367f, 45.534313f, 37.293446f, 52.771004f, 83.92678f, 13.032608f, 18.12446f, 53.132633f, 94.62536f, 6.5728045f, 53.180336f, 91.3407f, 87.52959f, 75.542244f, 35.689384f, 77.35545f, 34.4798f, 20.805649f, 58.3743f, 20.659788f, 82.26547f, 86.262726f, 52.37195f|],
         ([|10.347675f, 9.780841f, 13.856287f, -6.012946f, -4.7382054f, 8.367946f, 9.401735f, 15.068537f, -1.817153f, -7.370752f, 3.4046803f, 11.330664f, 10.847925f, -2.7064044f, -5.2589273f, 14.1636095f, 8.84061f, 13.839526f, -7.6758323f, -6.2717843f, 3.8768096f, 10.581014f, 12.523133f, -2.3586354f, -8.353604f, 4.4726243f, 5.366333f, 13.811482f, -4.8574266f, -13.994319f, 5.4610834f, 3.5517094f|],
         [|-10.957504f, 5.350463f, -1.666952f, 11.642888f, -10.062807f, -13.115515f, 5.590103f, 0.5764816f, 12.071388f, -7.898251f, -5.9327974f, 3.876094f, 1.0917499f, 14.917309f, -9.285036f, -9.714817f, 1.2858781f, -1.0205598f, 11.250289f, -4.4937367f, -10.066701f, 5.0761976f, 2.3962336f, 11.898649f, -4.429852f, -15.612979f, 3.3273313f, -1.798587f, 13.547301f, -6.1497493f, -15.029127f, 10.775686f|],
         [|10.569622f, 6.240201f, -9.809946f, -6.2869954f, 7.0655513f, 9.689009f, 6.2358103f, -10.042387f, -4.190213f, 13.046776f, 10.0338125f, 5.60827f, -11.286869f, -4.294997f, 8.936092f, 13.833233f, 7.796603f, -8.638148f, -6.3134418f, 9.426997f, 7.232523f, 5.7207565f, -9.897869f, -6.5040054f, 8.189255f, 8.523445f, 6.76692f, -10.556653f, -1.7893666f, 6.7633076f, 7.486924f, 6.068233f|]),
