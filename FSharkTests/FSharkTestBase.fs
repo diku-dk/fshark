@@ -178,7 +178,7 @@ module TestBase =
             printfn "Native took %d microseconds." <| FShark.Library.Utils.TicksToMicroseconds stopWatch2.ElapsedTicks
             let testOK = 
                 this.compareResults fsharkTestResult' nativeTestResult &&
-                this.compareResults testOutput nativeTestResult
+                this.compareResults nativeTestResult testOutput 
             
             in testOK
         
