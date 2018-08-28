@@ -286,6 +286,13 @@ module FSharkCompiler =
         | "op_Equality" -> Some <| FSharkCode.InfixOp (Eq, getFtype tps, args'.[0], args'.[1])
         | "op_Inequality" -> Some <| FSharkCode.InfixOp (NEq, getFtype tps, args'.[0], args'.[1])
         
+        | "op_LeftShift" -> Some <| FSharkCode.InfixBitOp (ShL, getFtype tps, args'.[0], args'.[1])
+        | "op_RightShift" -> Some <| FSharkCode.InfixBitOp (ShR, getFtype tps, args'.[0], args'.[1])
+        | "op_BitwiseAnd" -> Some <| FSharkCode.InfixBitOp (And, getFtype tps, args'.[0], args'.[1])
+        | "op_BitwiseOr" -> Some <| FSharkCode.InfixBitOp (Or, getFtype tps, args'.[0], args'.[1])
+        | "op_ExclusiveOr" -> Some <| FSharkCode.InfixBitOp (XOr, getFtype tps, args'.[0], args'.[1])
+        
+        
         | "op_PipeLeft" -> Some <| FSharkCode.InfixOp (PipeL, None, args'.[0], args'.[1])
         | "op_PipeRight" -> Some <| FSharkCode.InfixOp (PipeR, None, args'.[0], args'.[1])
         | "op_Range" -> Some <| FSharkCode.Range(args'.[0], args'.[1])
@@ -321,17 +328,17 @@ module FSharkCompiler =
             | "Sinh" -> Some <| Sinh args' tps
             | "Cosh" -> Some <| Cosh args' tps
             | "Tanh" -> Some <| Tanh args' tps
-            | "ToSingle" -> Some <| GetCall"f32.i64" [GetTypedCall tps "to_i64" args']
-            | "ToDouble" -> Some <| GetCall"f64.i64" [GetTypedCall tps "to_i64" args']
             | "ToSByte"  -> Some <| GetCall"i8.i64"  [GetTypedCall tps "to_i64" args']
-            | "ToByte"   -> Some <| GetCall"u8.i64"  [GetTypedCall tps "to_i64" args']
             | "ToInt"    -> Some <| GetCall"i32.i64" [GetTypedCall tps "to_i64" args']
             | "ToInt16"  -> Some <| GetCall"i16.i64" [GetTypedCall tps "to_i64" args']
             | "ToInt32"  -> Some <| GetCall"i32.i64" [GetTypedCall tps "to_i64" args']
             | "ToInt64"  -> Some <| GetCall"i64.i64" [GetTypedCall tps "to_i64" args']
+            | "ToByte"   -> Some <| GetCall"u8.i64"  [GetTypedCall tps "to_i64" args']
             | "ToUInt16" -> Some <| GetCall"u16.i64" [GetTypedCall tps "to_i64" args']
             | "ToUInt32" -> Some <| GetCall"u32.i64" [GetTypedCall tps "to_i64" args']
             | "ToUInt64" -> Some <| GetCall"u64.i64" [GetTypedCall tps "to_i64" args']
+            | "ToSingle" -> Some <| GetCall"f32.i64" [GetTypedCall tps "to_i64" args']
+            | "ToDouble" -> Some <| GetCall"f64.i64" [GetTypedCall tps "to_i64" args']
             
             | "Exp" -> Some <| GetTypedCall tps "exp" args'
             | "Log" -> Some <| GetTypedCall tps "log" args'

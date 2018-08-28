@@ -32,6 +32,13 @@ module IL =
                      | CompR
                      | PipeL
                      | PipeR
+                     
+                     
+    type FSharkBinBitOp = ShR
+                        | ShL
+                        | And
+                        | Or
+                        | XOr
                     
     type FSharkCode = Var of Name
                     | Const of (obj * FSharkType)
@@ -53,6 +60,7 @@ module IL =
                     
                     | UnaryOp of (FSharkUnaryOp * FSharkType option * FSharkCode)
                     | InfixOp of (FSharkBinOp * FSharkType option * FSharkCode * FSharkCode)
+                    | InfixBitOp of (FSharkBinBitOp * FSharkType option * FSharkCode * FSharkCode)
                     | SOAC of (Name * FSharkCode * FSharkCode list)
                     | Range of (FSharkCode * FSharkCode)
                     | Sequence of (FSharkCode * FSharkCode * FSharkCode)

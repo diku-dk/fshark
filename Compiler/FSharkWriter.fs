@@ -123,6 +123,9 @@ module FutharkWriter =
         | InfixOp (op, tp, e1, e2) ->
             bracketL(PrettyPrintFSharkBinOpExp op tp e1 e2)
             
+        | InfixBitOp (op, tp, e1, e2) ->
+            bracketL(PrettyPrintFSharkBinBitOpExp op tp e1 e2)
+            
         | SOAC (name, e, vals) ->
             let e' = PrettyPrintFSharkCode e
             let vals' = spaceListL <| List.map (bracketL << PrettyPrintFSharkCode) vals
@@ -176,6 +179,15 @@ module FutharkWriter =
             let p' = PrettyPrintFSharkInfixOp p
             in bracketL(e1' >||< p' >||< e2')
     
+    and PrettyPrintFSharkBinBitOpExp (p : FSharkBinBitOp) (tp : FSharkType option) (e1 : FSharkCode) (e2 : FSharkCode) : Doc =
+        let e1' = PrettyPrintFSharkCode e1
+        let e2' = PrettyPrintFSharkCode e2
+        let tp' = PrettyPrintFSharkTypeOption tp
+        let convertion = tp' >|< dotL >|< wordL "i32"
+    
+        let p' = PrettyPrintFSharkInfixBitOp p
+        in bracketL(e1' >||< p' >||< convertion >|< bracketL(e2'))
+            
     and PrettyPrintFSharkInfixOp (p : FSharkBinOp) : Doc =
         let symbol = match p with
             | FSharkBinOp.Add -> "+"
@@ -194,13 +206,23 @@ module FutharkWriter =
             | FSharkBinOp.NEq -> "!="
             | _ -> failwith <| p.ToString()
         in wordL symbol
+        
+    and PrettyPrintFSharkInfixBitOp (p : FSharkBinBitOp) : Doc =
+        let symbol = match p with
+            | FSharkBinBitOp.ShL -> "<<"
+            | FSharkBinBitOp.ShR -> ">>"
+            | FSharkBinBitOp.And -> "&"
+            | FSharkBinBitOp.Or -> "|"
+            | FSharkBinBitOp.XOr -> "^"
+            | _ -> failwith <| p.ToString()
+        in wordL symbol
     
     
     and PrettyPrintFSharkUnaryOpExp (p : FSharkUnaryOp) (tp : FSharkType option) (e1 : FSharkCode) : Doc =
         let e1' = PrettyPrintFSharkCode e1
         let p' = PrettyPrintFSharkUnaryOp p
         let tp' = PrettyPrintFSharkTypeOption tp
-        in tp' >|< p' >|< bracketL(e1')
+        in tp' >|< p' >|< dotL >|< bracketL(e1')
     
     and PrettyPrintFSharkUnaryOp (p : FSharkUnaryOp) : Doc =
         match p with
@@ -210,8 +232,9 @@ module FutharkWriter =
     and PrettyPrintFSharkTypeOption (opt : FSharkType option) : Doc =
         match opt with
         | None -> wordL ""
-        | Some tp -> PrettyPrintFSharkType tp >|< wordL "."
+        | Some tp -> PrettyPrintFSharkType tp
     
+    and dotL = wordL "."
     
     let StackDocs (docs : Doc list) : Doc = List.reduce (@@) docs
     
