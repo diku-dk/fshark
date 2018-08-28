@@ -435,6 +435,21 @@ module FSharkPrelude =
     let Flatten_4D xs : 'a array =
         Flatten <| Flatten_3D xs
         
+    let Unflatten n m (xs : 'a array) : 'a array array =
+        let res = Array.zeroCreate n
+        for i = 0 to n - 1 do
+            let row = Array.zeroCreate m
+            for j = 0 to m - 1 do
+                row.[j] <- xs.[i*m + j]
+            res.[i] <- row
+        res 
+        
+    let Unflatten_3D n m l (xs : 'a array) : 'a array array array =
+        Unflatten n m (Unflatten (n * m) l xs)
+        
+    let Unflatten_4D n m l k (xs : 'a array) : 'a array array array array =
+        Unflatten n m (Unflatten_3D (n * m) l k xs)
+        
     let rec Transpose (xs : 'a array array) : 'a array array =
         if Array.length xs.[0] = 0
         then Array.empty
@@ -446,9 +461,6 @@ module FSharkPrelude =
 
     (* TODO
     
-let unflatten 't (n: i32) (m: i32) (xs: []t): [n][m]t =
-  intrinsics.unflatten (n, m, xs)
-
 -- | Splits the outer dimension of an array in three.
 let unflatten_3d 't (n: i32) (m: i32) (l: i32) (xs: []t): [n][m][l]t =
   unflatten n m (unflatten (n*m) l xs)

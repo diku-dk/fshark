@@ -388,6 +388,21 @@ let RunTests =
         let expected = [|1;2;3;4;5;6;7;8;9;7;8;9|]
         in assert (res = expected); res = expected
     
+    let UnflattenTest1 =
+        let flat =  [|1;2;3;4;5;6;7;8;9;7;8;9|]
+        let res = Unflatten_3D 2 2 3 flat
+        let expected =  [|
+                    [|
+                        [|1;2;3|];
+                        [|4;5;6|]
+                    |];
+                    [|
+                        [|7;8;9|];
+                        [|7;8;9|]
+                    |]
+                    |]
+        in assert (res = expected); res = expected
+        
     let TransposeTest1 =
         let matrix = 
                     [|
@@ -520,6 +535,7 @@ let RunTests =
         ReplicateTest;
         FlattenTest1;
         FlattenTest2;
+        UnflattenTest1;
         Flatten_3DTest1;
         TransposeTest1]
         
