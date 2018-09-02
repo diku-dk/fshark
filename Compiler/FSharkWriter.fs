@@ -222,7 +222,7 @@ module FutharkWriter =
         let e1' = PrettyPrintFSharkCode e1
         let p' = PrettyPrintFSharkUnaryOp p
         let tp' = PrettyPrintFSharkTypeOption tp
-        in tp' >|< p' >|< dotL >|< bracketL(e1')
+        in tp' >|< dotL >|< p' >|< bracketL(e1')
     
     and PrettyPrintFSharkUnaryOp (p : FSharkUnaryOp) : Doc =
         match p with
