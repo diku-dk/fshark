@@ -1,4 +1,4 @@
-module Pathfinder
+module PathfinderKernel
 open FSharkPrelude
 // Code and comments based on
 // https://github.com/kkushagra/rodinia/blob/master/openmp/pathfinder/
