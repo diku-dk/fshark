@@ -35,16 +35,7 @@ let sobolInd (dirVct : int []) (n : int) : int =
     ) res (Iota 30)
 
 [<FSharkEntry>]
-let main (cols: int) (rows: int): int array =
-    let dirVct = sobolDirVcts
-    //---------------------
-    // 1. Initialization --
-    //---------------------
-    let wall_flat =
-        Map (fun (i: int) ->
-                (sobolInd dirVct i+1) % 10
-           ) (Iota (rows*cols))
-
+let main (cols: int) (rows: int) (wall_flat : int array) : int array =
     let wall   = Unflatten rows cols wall_flat
     let result = Copy (wall.[0])
 
