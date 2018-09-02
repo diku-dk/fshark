@@ -53,7 +53,7 @@ module FSharkMain =
             ; IsCompiled = false
             ; LibraryName = libName
             ; LibraryRoot = tmpRoot
-            ; LibraryPath = CreateTempLibDir tmpRoot
+            ; LibraryPath = tmpRoot
             ; PreludePath = preludePath
             ; LibraryInstance = null
             ; LibraryArgs = Array.empty
@@ -85,7 +85,6 @@ module FSharkMain =
         default this.CompileAndLoad = 
             let pipelineWatch = new Stopwatch()
             pipelineWatch.Start()
-            this.LibraryPath <- CreateTempLibDir this.LibraryRoot
             let srcs = this.ConcatenateSources
             let watch = new Stopwatch()
             watch.Start()
