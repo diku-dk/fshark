@@ -56,8 +56,11 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="srcs\ExampleModule.fs" />
+    <Compile Include="srcs\hotspot.fs" />
     <Compile Include="srcs\LocVolCalib.fs" />
+    <Compile Include="srcs\matrix.fs" />
     <Compile Include="srcs\nbody.fs" />
+    <Compile Include="srcs\pathfinder_kernel.fs" />
     <Compile Include="Program.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
