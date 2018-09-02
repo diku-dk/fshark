@@ -32,7 +32,7 @@ let sobolInd (dirVct : int []) (n : int) : int =
         in if (n_gray &&& t) = t
            then res' ^^^ dirVct.[i]
            else res'
-    ) res (Iota 30)
+    ) res (Reverse (Iota 30))
 
 [<FSharkEntry>]
 let main (cols: int) (rows: int) (wall_flat : int array) : int array =
@@ -49,5 +49,5 @@ let main (cols: int) (rows: int) (wall_flat : int array) : int array =
                 let res = if (i < cols-1) then min res result'.[i+1] else res
                 in wall.[t+1].[i] + res
            ) (Iota cols)
-       ) result (Iota (rows - 1))
+       ) result (Reverse (Iota (rows - 1)))
 
