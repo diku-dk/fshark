@@ -15,8 +15,6 @@ FSharkPrelude/bin/Debug/
 
 FSharkPrelude/obj/Debug/
 
-*.cs
-
 *.fut
 
 FSharkTests/obj/

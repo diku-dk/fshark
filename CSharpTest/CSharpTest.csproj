@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LocVolCalib, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>LocVolCalib.dll</HintPath>
+    <Reference Include="Matrix, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\FShark\Matrix.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
